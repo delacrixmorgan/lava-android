@@ -1,0 +1,46 @@
+package com.delacrixmorgan.android.data
+
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.delacrixmorgan.android.data.api.LavaApiService
+import com.delacrixmorgan.android.data.model.Photo
+import org.junit.Assert
+import org.junit.Test
+import org.junit.runner.RunWith
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.concurrent.CountDownLatch
+
+/**
+ * PhotoInstrumentedTests
+ * lava-android
+ *
+ * Created by Delacrix Morgan on 20/06/2019.
+ * Copyright (c) 2019 licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+ */
+
+@RunWith(AndroidJUnit4::class)
+class PhotoInstrumentedTests {
+    private val appContext = InstrumentationRegistry.getInstrumentation().context
+
+    @Test
+    fun loadRandomPhotos() {
+        val signal = CountDownLatch(1)
+
+        LavaApiService.create(this.appContext)
+            .loadRandomPhotos(2)
+            .enqueue(object : Callback<Array<Photo>> {
+                override fun onResponse(call: Call<Array<Photo>>, response: Response<Array<Photo>>) {
+                    Assert.assertTrue("Response Body is Empty", response.body() != null)
+                    signal.countDown()
+                }
+
+                override fun onFailure(call: Call<Array<Photo>>, t: Throwable) {
+                    Assert.fail(t.message)
+                    signal.countDown()
+                }
+            })
+        signal.await()
+    }
+}
