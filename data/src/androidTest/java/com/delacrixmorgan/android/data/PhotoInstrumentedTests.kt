@@ -29,7 +29,7 @@ class PhotoInstrumentedTests {
         val signal = CountDownLatch(1)
 
         LavaApiService.create(this.appContext)
-            .loadRandomPhotos(2)
+            .loadRandomPhotos(3)
             .enqueue(object : Callback<Array<Photo>> {
                 override fun onResponse(call: Call<Array<Photo>>, response: Response<Array<Photo>>) {
                     Assert.assertTrue("Response Body is Empty", response.body() != null)

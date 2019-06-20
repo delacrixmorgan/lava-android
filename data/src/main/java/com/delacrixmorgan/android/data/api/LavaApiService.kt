@@ -34,15 +34,15 @@ interface LavaApiService {
             }
 
             val retrofit = Retrofit.Builder()
-                .addConverterFactory(MoshiConverterFactory.create())
-                .client(builder.build())
-                .baseUrl(BASE_URL)
-                .build()
+                    .addConverterFactory(MoshiConverterFactory.create())
+                    .client(builder.build())
+                    .baseUrl(BASE_URL)
+                    .build()
 
             return retrofit.create(LavaApiService::class.java)
         }
     }
 
     @GET("photos/random")
-    fun loadRandomPhotos(@Query("count") count: Int = 1): Call<Array<Photo>>
+    fun loadRandomPhotos(@Query("count") count: Int = 3, @Query("page") page: Int = 1): Call<Array<Photo>>
 }
