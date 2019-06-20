@@ -88,4 +88,7 @@ lint/tmp/
 gen-external-apklibs
 output.json
 
+# API Keys
+/data/src/main/res/values/secrets.xml
+
 # End of https://www.gitignore.io/api/android
