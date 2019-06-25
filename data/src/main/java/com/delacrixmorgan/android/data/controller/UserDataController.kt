@@ -17,6 +17,12 @@ object UserDataController {
         return this.users.firstOrNull { it.id == id }
     }
 
+    fun getUsers(): List<User> {
+        var filteredItems: List<User> = this.users
+
+        return filteredItems
+    }
+
     fun processResponse(incomingItems: List<User>) {
         insert(incomingItems)
     }

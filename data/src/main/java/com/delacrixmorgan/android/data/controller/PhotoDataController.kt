@@ -26,7 +26,13 @@ object PhotoDataController {
         return this.photos.firstOrNull { it.id == id }
     }
 
-    private fun loadRandomPhotos(context: Context, itemCount: Int = 3, listener: LavaRestClient.LoadListListener<Photo>) {
+    fun getPhotos(): List<Photo> {
+        var filteredItems: List<Photo> = this.photos
+
+        return filteredItems
+    }
+
+    fun loadRandomPhotos(context: Context, itemCount: Int = 3, listener: LavaRestClient.LoadListListener<Photo>) {
         LavaApiService.create(context)
                 .loadRandomPhotos(itemCount)
                 .enqueue(object : Callback<Array<PhotoWrapper>> {
