@@ -1,4 +1,4 @@
-package com.delacrixmorgan.android.lava.photo
+package com.delacrixmorgan.android.lava.photo.grid
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,17 +13,17 @@ import com.delacrixmorgan.android.lava.R
 import kotlinx.android.synthetic.main.cell_photo.view.*
 
 /**
- * PhotoRecyclerViewAdapter
+ * GridPhotoRecyclerViewAdapter
  * lava-android
  *
  * Created by Delacrix Morgan on 25/06/2019.
  * Copyright (c) 2019 licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 
-class PhotoRecyclerViewAdapter(
+class GridPhotoRecyclerViewAdapter(
     private val maxHeight: Int,
-    private val listener: PhotoListListener
-) : RecyclerView.Adapter<PhotoRecyclerViewAdapter.PhotoItemViewHolder>() {
+    private val listener: GridPhotoListListener
+) : RecyclerView.Adapter<GridPhotoRecyclerViewAdapter.PhotoItemViewHolder>() {
     private val photos = arrayListOf<Photo>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoItemViewHolder {
@@ -45,7 +45,7 @@ class PhotoRecyclerViewAdapter(
         notifyDataSetChanged()
     }
 
-    inner class PhotoItemViewHolder(itemView: View, listener: PhotoListListener) : RecyclerView.ViewHolder(itemView) {
+    inner class PhotoItemViewHolder(itemView: View, listener: GridPhotoListListener) : RecyclerView.ViewHolder(itemView) {
         private lateinit var photo: Photo
 
         init {

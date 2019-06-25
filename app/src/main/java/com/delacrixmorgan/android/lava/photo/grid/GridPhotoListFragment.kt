@@ -1,4 +1,4 @@
-package com.delacrixmorgan.android.lava.photo
+package com.delacrixmorgan.android.lava.photo.grid
 
 import android.os.Bundle
 import android.transition.TransitionInflater
@@ -12,19 +12,20 @@ import com.delacrixmorgan.android.data.api.LavaRestClient
 import com.delacrixmorgan.android.data.controller.PhotoDataController
 import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.lava.R
+import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.fragment_photo_list.*
+import kotlinx.android.synthetic.main.fragment_grid_photo_list.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * PhotoListFragment
+ * GridPhotoListFragment
  * lava-android
  *
  * Created by Delacrix Morgan on 25/06/2019.
  * Copyright (c) 2019 licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 
-class PhotoListFragment : Fragment(), PhotoListListener, View.OnLayoutChangeListener {
+class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutChangeListener {
 
     private var spanCount = 3
     private val enterTransitionStarted = AtomicBoolean()
@@ -32,17 +33,17 @@ class PhotoListFragment : Fragment(), PhotoListListener, View.OnLayoutChangeList
         ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
     }
 
-    private lateinit var adapter: PhotoRecyclerViewAdapter
+    private lateinit var adapter: GridPhotoRecyclerViewAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_photo_list, container, false)
+        return inflater.inflate(R.layout.fragment_grid_photo_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val maxHeight = this.resources.displayMetrics.widthPixels / this.spanCount
-        this.adapter = PhotoRecyclerViewAdapter(maxHeight, this)
+        this.adapter = GridPhotoRecyclerViewAdapter(maxHeight, this)
 
 //        this.recyclerView.addOnLayoutChangeListener(this)
         this.recyclerView.adapter = this.adapter
@@ -83,7 +84,7 @@ class PhotoListFragment : Fragment(), PhotoListListener, View.OnLayoutChangeList
         })
     }
 
-    //region PhotoListListener
+    //region GridPhotoListListener
     override fun onPhotoSelected(viewHolder: View, photo: Photo, position: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

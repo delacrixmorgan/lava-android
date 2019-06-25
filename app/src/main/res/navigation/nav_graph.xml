@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/photoListFragment"
-        android:name="com.delacrixmorgan.android.lava.photo.PhotoListFragment"
+        android:name="com.delacrixmorgan.android.lava.photo.grid.GridPhotoListFragment"
         android:label="PhotoListFragment"
-        tools:layout="@layout/fragment_photo_list" />
+        tools:layout="@layout/fragment_grid_photo_list" />
 </navigation>
