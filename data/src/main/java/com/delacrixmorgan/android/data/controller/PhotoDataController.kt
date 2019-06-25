@@ -4,6 +4,8 @@ import android.content.Context
 import com.delacrixmorgan.android.data.api.LavaApiService
 import com.delacrixmorgan.android.data.api.LavaRestClient
 import com.delacrixmorgan.android.data.model.Photo
+import com.delacrixmorgan.android.data.model.PhotoWrapper
+import com.delacrixmorgan.android.data.processPhotos
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,24 +22,32 @@ import java.util.*
 object PhotoDataController {
     private var photos = listOf<Photo>()
 
+    fun getPhotoById(id: String): Photo? {
+        return this.photos.firstOrNull { it.id == id }
+    }
+
     private fun loadRandomPhotos(context: Context, itemCount: Int = 3, listener: LavaRestClient.LoadListListener<Photo>) {
         LavaApiService.create(context)
                 .loadRandomPhotos(itemCount)
-                .enqueue(object : Callback<Array<Photo>> {
-                    override fun onResponse(call: Call<Array<Photo>>, response: Response<Array<Photo>>) {
+                .enqueue(object : Callback<Array<PhotoWrapper>> {
+                    override fun onResponse(call: Call<Array<PhotoWrapper>>, response: Response<Array<PhotoWrapper>>) {
                         val incomingPhotos = response.body()?.toList()
                         if (incomingPhotos != null) {
-                            insert(incomingPhotos)
-                            listener.onComplete(list = incomingPhotos)
+                            val photos = incomingPhotos.processPhotos()
+                            listener.onComplete(list = photos)
                         } else {
                             listener.onComplete(error = Exception(response.errorBody().toString()))
                         }
                     }
 
-                    override fun onFailure(call: Call<Array<Photo>>, t: Throwable) {
+                    override fun onFailure(call: Call<Array<PhotoWrapper>>, t: Throwable) {
                         listener.onComplete(error = Exception(t.message))
                     }
                 })
+    }
+
+    fun processResponse(incomingItems: List<Photo>) {
+        insert(incomingItems)
     }
 
     private fun insert(incomingItems: List<Photo>) {

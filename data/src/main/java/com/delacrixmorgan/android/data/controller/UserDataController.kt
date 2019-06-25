@@ -3,7 +3,7 @@ package com.delacrixmorgan.android.data.controller
 import com.delacrixmorgan.android.data.model.User
 
 /**
- *  UserDataController.kt
+ *  UserDataController
  *  lava-android
  *
  *  Created by Delacrix Morgan on 20/06/2019.
@@ -12,6 +12,14 @@ import com.delacrixmorgan.android.data.model.User
 
 object UserDataController {
     private var users = listOf<User>()
+
+    fun getUserById(id: String): User? {
+        return this.users.firstOrNull { it.id == id }
+    }
+
+    fun processResponse(incomingItems: List<User>) {
+        insert(incomingItems)
+    }
 
     private fun insert(incomingItems: List<User>) {
         val incomingInts = HashSet<String>()

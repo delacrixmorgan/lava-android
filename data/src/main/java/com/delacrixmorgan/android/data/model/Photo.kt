@@ -1,5 +1,7 @@
 package com.delacrixmorgan.android.data.model
 
+import com.delacrixmorgan.android.data.controller.UserDataController
+
 /**
  * Photo
  * lava-android
@@ -9,7 +11,12 @@ package com.delacrixmorgan.android.data.model
  */
 
 data class Photo(
-        val id: String,
-        val urls: Map<String, String>,
-        val user: User
-)
+    val id: String,
+    val urls: Map<String, String>,
+    val userId: String
+) {
+    val user: User?
+    get() {
+        return UserDataController.getUserById(this.userId)
+    }
+}

@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.delacrixmorgan.android.data.api.LavaApiService
 import com.delacrixmorgan.android.data.model.Photo
+import com.delacrixmorgan.android.data.model.PhotoWrapper
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,13 +31,13 @@ class PhotoInstrumentedTests {
 
         LavaApiService.create(this.appContext)
             .loadRandomPhotos(3)
-            .enqueue(object : Callback<Array<Photo>> {
-                override fun onResponse(call: Call<Array<Photo>>, response: Response<Array<Photo>>) {
+            .enqueue(object : Callback<Array<PhotoWrapper>> {
+                override fun onResponse(call: Call<Array<PhotoWrapper>>, response: Response<Array<PhotoWrapper>>) {
                     Assert.assertTrue("Response Body is Empty", response.body() != null)
                     signal.countDown()
                 }
 
-                override fun onFailure(call: Call<Array<Photo>>, t: Throwable) {
+                override fun onFailure(call: Call<Array<PhotoWrapper>>, t: Throwable) {
                     Assert.fail(t.message)
                     signal.countDown()
                 }
