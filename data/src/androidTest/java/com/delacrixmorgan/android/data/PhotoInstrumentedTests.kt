@@ -52,17 +52,14 @@ class PhotoInstrumentedTests {
         val signal = CountDownLatch(1)
 
         PhotoDataController.loadRandomPhotos(this.appContext, listener = object : LavaRestClient.LoadListListener<Photo> {
-            override fun onComplete(list: List<Photo>?, error: Exception?) {
+            override fun onComplete(list: List<Photo>, error: Exception?) {
                 error?.let {
                     Assert.fail(it.message)
                     signal.countDown()
                     return
                 }
 
-                list?.let { photos ->
-                    Assert.assertTrue("Photos are Empty", photos.isNotEmpty())
-                }
-
+                Assert.assertTrue("Photos are Empty", list.isNotEmpty())
                 signal.countDown()
             }
         })

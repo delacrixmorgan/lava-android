@@ -1,11 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="LargeTitle" parent="Base.TextAppearance.AppCompat.Title">
+        <item name="android:textSize">34sp</item>
+    </style>
+
+    <style name="Title1" parent="Base.TextAppearance.AppCompat.Title">
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="Title2" parent="Base.TextAppearance.AppCompat.Title">
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="Title3" parent="Base.TextAppearance.AppCompat.Title">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Headline" parent="Base.TextAppearance.AppCompat.Headline">
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="Body" parent="Base.TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="Callout" parent="Base.TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Subhead" parent="Base.TextAppearance.AppCompat.Subhead">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Footnote" parent="Base.TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="Caption" parent="Base.TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">12sp</item>
     </style>
 
 </resources>

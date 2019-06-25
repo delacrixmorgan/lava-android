@@ -10,6 +10,6 @@ package com.delacrixmorgan.android.data.api
 
 class LavaRestClient {
     interface LoadListListener<T> {
-        fun onComplete(list: List<T>? = null, error: Exception? = null)
+        fun onComplete(list: List<T> = listOf(), error: Exception? = null)
     }
 }

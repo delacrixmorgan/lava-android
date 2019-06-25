@@ -16,7 +16,19 @@ data class Photo(
     val userId: String
 ) {
     val user: User?
-    get() {
-        return UserDataController.getUserById(this.userId)
+        get() {
+            return UserDataController.getUserById(this.userId)
+        }
+
+    fun getUrl(urlType: UrlType): String {
+        return urls[urlType.name.toLowerCase()].toString()
+    }
+
+    enum class UrlType {
+        RAW,
+        FULL,
+        REGULAR,
+        SMALL,
+        THUMB
     }
 }
