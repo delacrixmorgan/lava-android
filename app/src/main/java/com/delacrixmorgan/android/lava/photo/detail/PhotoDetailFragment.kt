@@ -73,8 +73,10 @@ class PhotoDetailFragment : Fragment() {
                 .load(this.photo?.getUrl(Photo.UrlType.THUMB))
                 .listener(object : RequestListener<Drawable> {
                     override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                        bigImageView.showImage(Uri.parse(photo?.getUrl(Photo.UrlType.THUMB)), Uri.parse(photo?.getUrl(Photo.UrlType.REGULAR)))
-                        bigImageView.isVisible = true
+                        if (bigImageView != null) {
+                            bigImageView.showImage(Uri.parse(photo?.getUrl(Photo.UrlType.THUMB)), Uri.parse(photo?.getUrl(Photo.UrlType.REGULAR)))
+                            bigImageView.isVisible = true
+                        }
 
                         parentFragment?.startPostponedEnterTransition()
                         return false

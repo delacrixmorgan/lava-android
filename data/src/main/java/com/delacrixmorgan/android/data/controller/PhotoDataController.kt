@@ -42,7 +42,7 @@ object PhotoDataController {
                             val photos = incomingPhotos.processPhotos()
                             listener.onComplete(list = photos)
                         } else {
-                            listener.onComplete(error = Exception(response.errorBody().toString()))
+                            listener.onComplete(error = Exception("${response.errorBody()?.string()}"))
                         }
                     }
 

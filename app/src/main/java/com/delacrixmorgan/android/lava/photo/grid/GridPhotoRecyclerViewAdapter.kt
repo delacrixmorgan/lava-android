@@ -46,7 +46,13 @@ class GridPhotoRecyclerViewAdapter(
     override fun getItemCount() = this.photos.size
 
     fun updateDataSet(photos: List<Photo>) {
+        val previousPosition = this.photos.size
         this.photos.addAll(photos)
+        notifyItemInserted(previousPosition)
+    }
+
+    fun removeDataSet(){
+        this.photos.clear()
         notifyDataSetChanged()
     }
 

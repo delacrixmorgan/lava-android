@@ -12,18 +12,10 @@ import com.delacrixmorgan.android.data.model.Photo
  * Copyright (c) 2019 licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
  */
 
-class PhotoViewPagerAdapter(fragment: Fragment) : FragmentStatePagerAdapter(fragment.childFragmentManager) {
-    private var photos = listOf<Photo>()
-
+class PhotoViewPagerAdapter(fragment: Fragment, private val photos: ArrayList<Photo>) : FragmentStatePagerAdapter(fragment.childFragmentManager) {
     override fun getCount() = this.photos.size
-
     override fun getItem(position: Int): Fragment {
         val photo = this.photos[position]
         return PhotoDetailFragment.newInstance(photo)
-    }
-
-    fun updateDataSet(photos: List<Photo>) {
-        this.photos = photos
-        notifyDataSetChanged()
     }
 }

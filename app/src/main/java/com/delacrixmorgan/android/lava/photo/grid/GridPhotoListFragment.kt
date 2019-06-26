@@ -18,6 +18,7 @@ import com.delacrixmorgan.android.data.api.LavaRestClient
 import com.delacrixmorgan.android.data.controller.PhotoDataController
 import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.lava.R
+import com.delacrixmorgan.android.lava.compatColor
 import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.delacrixmorgan.android.lava.photo.detail.PhotoListFragment
 import com.github.piasy.biv.BigImageViewer
@@ -79,6 +80,19 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
                 }
             }
         })
+        
+        this.swipeRefreshLayout.setColorSchemeColors(
+                R.color.colorPrimary.compatColor(this.context),
+                R.color.colorPrimaryDark.compatColor(this.context),
+                R.color.colorAccent.compatColor(this.context),
+                R.color.colorPrimaryLight.compatColor(this.context)
+        )
+
+        this.swipeRefreshLayout.setOnRefreshListener {
+            this.viewModel.collage.clear()
+            this.adapter.removeDataSet()
+            refreshFromServer()
+        }
 
         if (this.adapter.itemCount == 0) {
             refreshFromServer()
@@ -107,6 +121,8 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     private fun refreshFromServer() {
         PhotoDataController.loadRandomPhotos(requireContext(), 48, listener = object : LavaRestClient.LoadListListener<Photo> {
             override fun onComplete(list: List<Photo>, error: Exception?) {
+                swipeRefreshLayout.isRefreshing = false
+
                 error?.let {
                     Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
                     return

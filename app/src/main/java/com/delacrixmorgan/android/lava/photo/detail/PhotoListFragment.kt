@@ -47,12 +47,12 @@ class PhotoListFragment : Fragment(), ViewPager.OnPageChangeListener {
             postponeEnterTransition()
         }
 
-        this.adapter = PhotoViewPagerAdapter(this)
-        this.adapter.updateDataSet(this.viewModel.collage)
+        this.adapter = PhotoViewPagerAdapter(this, this.viewModel.collage)
 
         this.viewPager.adapter = this.adapter
-        this.viewPager.setCurrentItem(this.viewModel.currentPosition, false)
+        this.viewPager.offscreenPageLimit = 3
         this.viewPager.addOnPageChangeListener(this)
+        this.viewPager.setCurrentItem(this.viewModel.currentPosition, false)
     }
 
     private fun prepareSharedElementTransition() {

@@ -4,7 +4,6 @@
     android:id="@+id/gridImageView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
     android:scaleType="centerCrop"
     tools:layout_height="200dp"
     tools:layout_width="200dp" />
