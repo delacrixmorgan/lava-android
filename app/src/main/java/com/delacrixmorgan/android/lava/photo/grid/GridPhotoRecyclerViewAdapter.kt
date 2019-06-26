@@ -51,7 +51,7 @@ class GridPhotoRecyclerViewAdapter(
         notifyItemInserted(previousPosition)
     }
 
-    fun removeDataSet(){
+    fun removeDataSet() {
         this.photos.clear()
         notifyDataSetChanged()
     }
@@ -67,12 +67,16 @@ class GridPhotoRecyclerViewAdapter(
 
         fun updateData(photo: Photo) {
             this.photo = photo
-            val photoUrl = this.photo.getUrl(Photo.UrlType.THUMB)
+            val photoUrl = this.photo.getUrl(Photo.UrlType.REGULAR)
 
             ViewCompat.setTransitionName(this.itemView.gridImageView, photoUrl)
 
             Glide.with(this.itemView.context)
                     .load(photoUrl)
+                    .thumbnail(
+                            Glide.with(this.itemView.context)
+                                    .load(this.photo.getUrl(Photo.UrlType.THUMB))
+                    )
                     .listener(object : RequestListener<Drawable> {
                         override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
                             listener.onLoadCompleted(itemView.gridImageView, adapterPosition)
