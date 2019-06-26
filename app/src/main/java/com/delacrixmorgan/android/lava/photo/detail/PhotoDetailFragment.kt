@@ -68,7 +68,7 @@ class PhotoDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
 
-        ViewCompat.setTransitionName(this.imageView, this.photo?.getUrl(Photo.UrlType.THUMB))
+        ViewCompat.setTransitionName(this.gridImageView, this.photo?.getUrl(Photo.UrlType.THUMB))
         Glide.with(view.context)
                 .load(this.photo?.getUrl(Photo.UrlType.THUMB))
                 .listener(object : RequestListener<Drawable> {
@@ -87,6 +87,6 @@ class PhotoDetailFragment : Fragment() {
 
                 })
                 .apply(requestOptions)
-                .into(this.imageView)
+                .into(this.gridImageView)
     }
 }

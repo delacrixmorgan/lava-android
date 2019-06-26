@@ -31,7 +31,7 @@ class PhotoListFragment : Fragment(), ViewPager.OnPageChangeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.sharedElementEnterTransition = TransitionInflater.from(this.context).inflateTransition(R.transition.image_transition).apply {
-            duration = 325
+            duration = 375
         }
     }
 
@@ -42,6 +42,7 @@ class PhotoListFragment : Fragment(), ViewPager.OnPageChangeListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prepareSharedElementTransition()
+
         if (savedInstanceState == null) {
             postponeEnterTransition()
         }
@@ -56,7 +57,7 @@ class PhotoListFragment : Fragment(), ViewPager.OnPageChangeListener {
 
     private fun prepareSharedElementTransition() {
         this.sharedElementEnterTransition = TransitionInflater.from(this.context).inflateTransition(R.transition.image_transition).apply {
-            duration = 325
+            duration = 375
         }
 
         setEnterSharedElementCallback(object : SharedElementCallback() {

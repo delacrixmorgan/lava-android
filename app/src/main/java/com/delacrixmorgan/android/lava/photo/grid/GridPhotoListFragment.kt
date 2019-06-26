@@ -66,6 +66,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     private fun prepareTransitions() {
         this.exitTransition = TransitionInflater.from(this.context).inflateTransition(R.transition.grid_exit_transition).apply {
             duration = 375
+            startDelay = 25
         }
 
         postponeEnterTransition()
@@ -107,7 +108,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
         this.activity?.supportFragmentManager?.transaction {
             addSharedElement(viewHolder.gridImageView, transitionName)
-            replace(R.id.rootView, imageListFragment, imageListFragment.javaClass.simpleName)
+            replace(R.id.mainContainer, imageListFragment)
             addToBackStack(null)
         }
     }

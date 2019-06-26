@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.transaction
 import com.github.piasy.biv.BigImageViewer
 import com.github.piasy.biv.loader.glide.GlideImageLoader
 
@@ -27,5 +28,10 @@ class MainActivity : AppCompatActivity() {
         }
         setContentView(R.layout.activity_main)
         BigImageViewer.initialize(GlideImageLoader.with(this))
+
+        val launchFragment = LaunchFragment()
+        this.supportFragmentManager.transaction {
+            replace(R.id.mainContainer, launchFragment, launchFragment::class.java.simpleName)
+        }
     }
 }
