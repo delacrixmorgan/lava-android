@@ -54,10 +54,12 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         super.onViewCreated(view, savedInstanceState)
         prepareTransitions()
 
-        val maxHeight = this.resources.displayMetrics.widthPixels / this.spanCount
+        if (this.viewModel.maxHeight == 0) {
+            this.viewModel.maxHeight = ((this.resources.displayMetrics.widthPixels * 1.5) / this.spanCount).toInt()
+        }
 
         this.layoutManager = GridLayoutManager(view.context, this.spanCount, RecyclerView.VERTICAL, false)
-        this.adapter = GridPhotoRecyclerViewAdapter(maxHeight, this)
+        this.adapter = GridPhotoRecyclerViewAdapter(this.viewModel.maxHeight, this)
         this.adapter.updateDataSet(this.viewModel.collage)
 
         this.recyclerView.addOnLayoutChangeListener(this)
@@ -80,7 +82,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
                 }
             }
         })
-        
+
         this.swipeRefreshLayout.setColorSchemeColors(
                 R.color.colorPrimary.compatColor(this.context),
                 R.color.colorPrimaryDark.compatColor(this.context),
@@ -96,6 +98,21 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
         if (this.adapter.itemCount == 0) {
             refreshFromServer()
+        }
+
+        if (savedInstanceState != null) {
+            restorePhotoListFragment()
+        }
+    }
+
+    private fun restorePhotoListFragment() {
+        this.activity?.supportFragmentManager?.apply {
+            findFragmentByTag(PhotoListFragment::class.java.simpleName)?.let { fragment ->
+                transaction {
+                    replace(R.id.mainContainer, fragment)
+                    addToBackStack(fragment::class.java.simpleName)
+                }
+            }
         }
     }
 
@@ -121,7 +138,9 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     private fun refreshFromServer() {
         PhotoDataController.loadRandomPhotos(requireContext(), 48, listener = object : LavaRestClient.LoadListListener<Photo> {
             override fun onComplete(list: List<Photo>, error: Exception?) {
-                swipeRefreshLayout.isRefreshing = false
+                if (swipeRefreshLayout != null) {
+                    swipeRefreshLayout.isRefreshing = false
+                }
 
                 error?.let {
                     Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
@@ -147,7 +166,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         this.activity?.supportFragmentManager?.transaction {
             addSharedElement(viewHolder.gridImageView, transitionName)
             replace(R.id.mainContainer, imageListFragment)
-            addToBackStack(null)
+            addToBackStack(imageListFragment::class.java.simpleName)
         }
     }
 

@@ -12,6 +12,7 @@ import com.delacrixmorgan.android.data.model.Photo
  */
 
 class PhotoViewModel : ViewModel() {
+    var maxHeight = 0
     var currentPosition = 0
     var collage = arrayListOf<Photo>()
 }
