@@ -1,13 +1,18 @@
 package com.delacrixmorgan.android.lava.photo.grid
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.lava.R
 import kotlinx.android.synthetic.main.cell_photo.view.*
@@ -21,8 +26,8 @@ import kotlinx.android.synthetic.main.cell_photo.view.*
  */
 
 class GridPhotoRecyclerViewAdapter(
-    private val maxHeight: Int,
-    private val listener: GridPhotoListListener
+        private val maxHeight: Int,
+        private val listener: GridPhotoListListener
 ) : RecyclerView.Adapter<GridPhotoRecyclerViewAdapter.PhotoItemViewHolder>() {
     private val photos = arrayListOf<Photo>()
 
@@ -61,13 +66,24 @@ class GridPhotoRecyclerViewAdapter(
             ViewCompat.setTransitionName(this.itemView.gridImageView, photoUrl)
 
             Glide.with(this.itemView.context)
-                .load(photoUrl)
-                .apply(
-                    RequestOptions()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .dontTransform()
-                )
-                .into(this.itemView.gridImageView)
+                    .load(photoUrl)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                            listener.onLoadCompleted(itemView.gridImageView, adapterPosition)
+                            return false
+                        }
+
+                        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                            listener.onLoadCompleted(itemView.gridImageView, adapterPosition)
+                            return false
+                        }
+
+                    })
+                    .apply(RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .dontTransform()
+                    )
+                    .into(this.itemView.gridImageView)
         }
     }
 }

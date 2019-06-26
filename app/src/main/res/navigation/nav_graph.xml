@@ -12,7 +12,9 @@
         tools:layout="@layout/fragment_launch">
         <action
             android:id="@+id/action_launchFragment_to_photoListFragment"
-            app:destination="@id/gridPhotoListFragment" />
+            app:destination="@id/gridPhotoListFragment"
+            app:popUpTo="@+id/launchFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/gridPhotoListFragment"

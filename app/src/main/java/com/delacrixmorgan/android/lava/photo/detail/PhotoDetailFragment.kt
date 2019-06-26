@@ -1,12 +1,23 @@
 package com.delacrixmorgan.android.lava.photo.detail
 
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.transition.TransitionInflater
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.delacrixmorgan.android.data.controller.PhotoDataController
 import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.lava.R
@@ -36,6 +47,13 @@ class PhotoDetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        postponeEnterTransition()
+
+        if (this.sharedElementEnterTransition == null) {
+            this.sharedElementEnterTransition = TransitionInflater.from(this.context).inflateTransition(R.transition.image_transition)?.apply {
+                duration = 375
+            }
+        }
 
         this.arguments?.getString(ARG_PHOTO_ID)?.let { id ->
             this.photo = PhotoDataController.getPhotoById(id)
@@ -48,6 +66,27 @@ class PhotoDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        this.subSamplingImageView.showImage(Uri.parse(this.photo?.getUrl(Photo.UrlType.THUMB)), Uri.parse(this.photo?.getUrl(Photo.UrlType.REGULAR)))
+        val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+
+        ViewCompat.setTransitionName(this.imageView, this.photo?.getUrl(Photo.UrlType.THUMB))
+        Glide.with(view.context)
+                .load(this.photo?.getUrl(Photo.UrlType.THUMB))
+                .listener(object : RequestListener<Drawable> {
+                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                        bigImageView.showImage(Uri.parse(photo?.getUrl(Photo.UrlType.THUMB)), Uri.parse(photo?.getUrl(Photo.UrlType.REGULAR)))
+                        bigImageView.isVisible = true
+
+                        parentFragment?.startPostponedEnterTransition()
+                        return false
+                    }
+
+                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                        parentFragment?.startPostponedEnterTransition()
+                        return false
+                    }
+
+                })
+                .apply(requestOptions)
+                .into(this.imageView)
     }
 }

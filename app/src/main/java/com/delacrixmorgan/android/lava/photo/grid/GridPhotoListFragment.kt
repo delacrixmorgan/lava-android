@@ -1,20 +1,26 @@
 package com.delacrixmorgan.android.lava.photo.grid
 
+import android.net.Uri
 import android.os.Bundle
-import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.SharedElementCallback
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.transaction
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.Navigation
+import androidx.transition.TransitionInflater
+import androidx.transition.TransitionSet
 import com.delacrixmorgan.android.data.api.LavaRestClient
 import com.delacrixmorgan.android.data.controller.PhotoDataController
 import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.lava.R
 import com.delacrixmorgan.android.lava.photo.PhotoViewModel
+import com.delacrixmorgan.android.lava.photo.detail.PhotoListFragment
+import com.github.piasy.biv.BigImageViewer
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.cell_photo.view.*
 import kotlinx.android.synthetic.main.fragment_grid_photo_list.*
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -42,23 +48,25 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        prepareTransitions()
 
         val maxHeight = this.resources.displayMetrics.widthPixels / this.spanCount
+
         this.adapter = GridPhotoRecyclerViewAdapter(maxHeight, this)
         this.adapter.updateDataSet(this.viewModel.collage)
 
-//        this.recyclerView.addOnLayoutChangeListener(this)
+        this.recyclerView.addOnLayoutChangeListener(this)
         this.recyclerView.adapter = this.adapter
 
         if (this.adapter.itemCount == 0) {
             refreshDataSet()
         }
-
-//        prepareTransitions()
     }
 
     private fun prepareTransitions() {
-        this.exitTransition = TransitionInflater.from(this.context).inflateTransition(R.transition.grid_exit_transition)
+        this.exitTransition = TransitionInflater.from(this.context).inflateTransition(R.transition.grid_exit_transition).apply {
+            duration = 375
+        }
 
         postponeEnterTransition()
         setExitSharedElementCallback(object : SharedElementCallback() {
@@ -81,6 +89,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
                     return
                 }
 
+                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
                 viewModel.collage.addAll(list)
                 adapter.updateDataSet(list)
             }
@@ -90,9 +99,17 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     //region GridPhotoListListener
     override fun onPhotoSelected(viewHolder: View, photo: Photo, position: Int) {
         this.viewModel.currentPosition = position
+        (this.exitTransition as TransitionSet).excludeTarget(viewHolder, true)
 
-        val action = GridPhotoListFragmentDirections.actionGridPhotoListFragmentToPhotoListFragment()
-        Navigation.findNavController(rootView).navigate(action)
+        val imageListFragment = PhotoListFragment()
+        val transitionName = ViewCompat.getTransitionName(viewHolder.gridImageView)
+                ?: "gridImageView"
+
+        this.activity?.supportFragmentManager?.transaction {
+            addSharedElement(viewHolder.gridImageView, transitionName)
+            replace(R.id.rootView, imageListFragment, imageListFragment.javaClass.simpleName)
+            addToBackStack(null)
+        }
     }
 
     override fun onLoadCompleted(view: View, position: Int) {
@@ -103,6 +120,14 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
     //region View.OnLayoutChangeListener
     override fun onLayoutChange(view: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
+        this.recyclerView.removeOnLayoutChangeListener(this)
+        val layoutManager = this.recyclerView.layoutManager ?: return
+        val currentPosition = this.viewModel.currentPosition
+        val viewAtPosition = layoutManager.findViewByPosition(currentPosition)
+
+        if (viewAtPosition == null || layoutManager.isViewPartiallyVisible(viewAtPosition, false, true)) {
+            this.recyclerView.post { layoutManager.scrollToPosition(currentPosition) }
+        }
     }
     //endregion
 }
