@@ -18,6 +18,7 @@ import com.delacrixmorgan.android.data.api.LavaRestClient
 import com.delacrixmorgan.android.data.controller.PhotoDataController
 import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.lava.R
+import com.delacrixmorgan.android.lava.common.AspectRatioGridLayoutManager
 import com.delacrixmorgan.android.lava.compatColor
 import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.delacrixmorgan.android.lava.photo.detail.PhotoListFragment
@@ -37,13 +38,17 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutChangeListener {
 
-    private var spanCount = 3
+    companion object {
+        private const val GRID_LAYOUT_ASPECT_RATIO = 1.6F
+        private const val SPAN_COUNT = 3
+    }
+
     private val enterTransitionStarted = AtomicBoolean()
     private val viewModel: PhotoViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
     }
 
-    private lateinit var layoutManager: GridLayoutManager
+    private lateinit var layoutManager: AspectRatioGridLayoutManager
     private lateinit var adapter: GridPhotoRecyclerViewAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -54,12 +59,19 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         super.onViewCreated(view, savedInstanceState)
         prepareTransitions()
 
-        if (this.viewModel.maxHeight == 0) {
-            this.viewModel.maxHeight = ((this.resources.displayMetrics.widthPixels * 1.5) / this.spanCount).toInt()
+        if (this.viewModel.displayMetrics == null) {
+            this.viewModel.displayMetrics = this.resources.displayMetrics
         }
 
-        this.layoutManager = GridLayoutManager(view.context, this.spanCount, RecyclerView.VERTICAL, false)
-        this.adapter = GridPhotoRecyclerViewAdapter(this.viewModel.maxHeight, this)
+        val maxHeight = this.viewModel.heightPixels / SPAN_COUNT
+
+        this.layoutManager = AspectRatioGridLayoutManager(
+                context = view.context,
+                spanCount = SPAN_COUNT,
+                aspectRatio = GRID_LAYOUT_ASPECT_RATIO,
+                fittingSize = this.viewModel.widthPixels
+        )
+        this.adapter = GridPhotoRecyclerViewAdapter(maxHeight, this)
         this.adapter.updateDataSet(this.viewModel.collage)
 
         this.recyclerView.addOnLayoutChangeListener(this)

@@ -1,5 +1,6 @@
 package com.delacrixmorgan.android.lava.photo
 
+import android.util.DisplayMetrics
 import androidx.lifecycle.ViewModel
 import com.delacrixmorgan.android.data.model.Photo
 
@@ -12,7 +13,17 @@ import com.delacrixmorgan.android.data.model.Photo
  */
 
 class PhotoViewModel : ViewModel() {
-    var maxHeight = 0
+    var displayMetrics: DisplayMetrics? = null
     var currentPosition = 0
     var collage = arrayListOf<Photo>()
+
+    val widthPixels: Int
+        get() {
+            return this.displayMetrics?.widthPixels ?: 0
+        }
+
+    val heightPixels: Int
+        get() {
+            return this.displayMetrics?.heightPixels ?: 0
+        }
 }
