@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.app.SharedElementCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.Navigation
 import com.delacrixmorgan.android.data.api.LavaRestClient
 import com.delacrixmorgan.android.data.controller.PhotoDataController
 import com.delacrixmorgan.android.data.model.Photo
@@ -44,6 +45,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
         val maxHeight = this.resources.displayMetrics.widthPixels / this.spanCount
         this.adapter = GridPhotoRecyclerViewAdapter(maxHeight, this)
+        this.adapter.updateDataSet(this.viewModel.collage)
 
 //        this.recyclerView.addOnLayoutChangeListener(this)
         this.recyclerView.adapter = this.adapter
@@ -79,6 +81,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
                     return
                 }
 
+                viewModel.collage.addAll(list)
                 adapter.updateDataSet(list)
             }
         })
@@ -86,7 +89,10 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
     //region GridPhotoListListener
     override fun onPhotoSelected(viewHolder: View, photo: Photo, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        this.viewModel.currentPosition = position
+
+        val action = GridPhotoListFragmentDirections.actionGridPhotoListFragmentToPhotoListFragment()
+        Navigation.findNavController(rootView).navigate(action)
     }
 
     override fun onLoadCompleted(view: View, position: Int) {

@@ -12,11 +12,20 @@
         tools:layout="@layout/fragment_launch">
         <action
             android:id="@+id/action_launchFragment_to_photoListFragment"
+            app:destination="@id/gridPhotoListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gridPhotoListFragment"
+        android:name="com.delacrixmorgan.android.lava.photo.grid.GridPhotoListFragment"
+        android:label="PhotoListFragment"
+        tools:layout="@layout/fragment_grid_photo_list">
+        <action
+            android:id="@+id/action_gridPhotoListFragment_to_photoListFragment"
             app:destination="@id/photoListFragment" />
     </fragment>
     <fragment
         android:id="@+id/photoListFragment"
-        android:name="com.delacrixmorgan.android.lava.photo.grid.GridPhotoListFragment"
+        android:name="com.delacrixmorgan.android.lava.photo.detail.PhotoListFragment"
         android:label="PhotoListFragment"
-        tools:layout="@layout/fragment_grid_photo_list" />
+        tools:layout="@layout/fragment_photo_list" />
 </navigation>

@@ -1,6 +1,7 @@
 package com.delacrixmorgan.android.lava.photo
 
 import androidx.lifecycle.ViewModel
+import com.delacrixmorgan.android.data.model.Photo
 
 /**
  * PhotoViewModel
@@ -12,4 +13,5 @@ import androidx.lifecycle.ViewModel
 
 class PhotoViewModel : ViewModel() {
     var currentPosition = 0
+    var collage = arrayListOf<Photo>()
 }
