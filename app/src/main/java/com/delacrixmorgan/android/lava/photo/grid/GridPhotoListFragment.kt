@@ -10,6 +10,8 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionInflater
 import androidx.transition.TransitionSet
 import com.delacrixmorgan.android.data.api.LavaRestClient
@@ -40,6 +42,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
     }
 
+    private lateinit var layoutManager: GridLayoutManager
     private lateinit var adapter: GridPhotoRecyclerViewAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -52,14 +55,33 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
         val maxHeight = this.resources.displayMetrics.widthPixels / this.spanCount
 
+        this.layoutManager = GridLayoutManager(view.context, this.spanCount, RecyclerView.VERTICAL, false)
         this.adapter = GridPhotoRecyclerViewAdapter(maxHeight, this)
         this.adapter.updateDataSet(this.viewModel.collage)
 
         this.recyclerView.addOnLayoutChangeListener(this)
         this.recyclerView.adapter = this.adapter
+        this.recyclerView.layoutManager = this.layoutManager
+
+        this.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        val visibleItemCount = layoutManager.childCount
+                        val totalItemCount = layoutManager.itemCount - visibleItemCount
+                        val pastVisibleItems = layoutManager.findFirstVisibleItemPosition()
+
+                        if (pastVisibleItems + visibleItemCount >= totalItemCount && adapter.itemCount > 0) {
+                            refreshFromServer()
+                        }
+                    }
+                }
+            }
+        })
 
         if (this.adapter.itemCount == 0) {
-            refreshDataSet()
+            refreshFromServer()
         }
     }
 
@@ -82,7 +104,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         })
     }
 
-    private fun refreshDataSet() {
+    private fun refreshFromServer() {
         PhotoDataController.loadRandomPhotos(requireContext(), 48, listener = object : LavaRestClient.LoadListListener<Photo> {
             override fun onComplete(list: List<Photo>, error: Exception?) {
                 error?.let {
