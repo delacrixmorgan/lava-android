@@ -6,6 +6,7 @@ import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.SharedElementCallback
+import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
@@ -59,24 +60,6 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_grid_photo_list, container, false)
-    }
-
-    private fun setupToolbar() {
-        val activity = requireActivity() as AppCompatActivity
-        activity.setSupportActionBar(this.toolbar)
-        activity.supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeButtonEnabled(true)
-            setHomeAsUpIndicator(R.drawable.ic_menu)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            this.drawerLayout.openDrawer(Gravity.START)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -164,15 +147,60 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         this.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 searchView.clearFocus()
-//                updateDataSet(query)
+                hideSoftInputKeyboard()
+                searchFromServer(query)
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-//                updateDataSet(newText)
+                searchFromServer(newText)
                 return true
             }
         })
+    }
+
+    private fun setupToolbar() {
+        val activity = requireActivity() as AppCompatActivity
+        activity.setSupportActionBar(this.toolbar)
+        activity.supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeButtonEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_menu)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            android.R.id.home -> {
+                this.drawerLayout.openDrawer(GravityCompat.START)
+            }
+
+            R.id.grid -> {
+
+            }
+
+            R.id.staggered -> {
+
+            }
+
+            R.id.credits -> {
+
+            }
+
+            R.id.support -> {
+
+            }
+
+            R.id.sourceCode -> {
+
+            }
+
+            else -> {
+                return super.onOptionsItemSelected(item)
+            }
+        }
+
+        return true
     }
 
     private fun restorePhotoListFragment() {
@@ -203,6 +231,10 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
                 }
             }
         })
+    }
+
+    private fun searchFromServer(query: String?) {
+
     }
 
     private fun refreshFromServer() {

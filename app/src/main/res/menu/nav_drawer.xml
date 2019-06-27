@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/account"
-        android:title="My Account" />
-    <item
-        android:id="@+id/settings"
-        android:title="Settings" />
-    <item
-        android:id="@+id/mycart"
-        android:title="My Cart" />
+    <group
+        android:id="@+id/layoutManager"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/grid"
+            android:title="Grid Layout" />
+        <item
+            android:id="@+id/staggered"
+            android:title="Staggered Layout" />
+    </group>
+    <group
+        android:id="@+id/preference"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/credits"
+            android:title="Hearts and Kisses" />
 
+        <item
+            android:id="@+id/support"
+            android:title="Support" />
+
+        <item
+            android:id="@+id/sourceCode"
+            android:title="Source Code" />
+    </group>
 </menu>
