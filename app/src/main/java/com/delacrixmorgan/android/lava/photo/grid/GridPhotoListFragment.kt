@@ -238,7 +238,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     }
 
     private fun refreshFromServer() {
-        PhotoDataController.loadRandomPhotos(requireContext(), 48, listener = object : LavaRestClient.LoadListListener<Photo> {
+        PhotoDataController.loadRandomPhotos(requireContext(), 30, listener = object : LavaRestClient.LoadListListener<Photo> {
             override fun onComplete(list: List<Photo>, error: Exception?) {
                 if (swipeRefreshLayout != null) {
                     swipeRefreshLayout.isRefreshing = false

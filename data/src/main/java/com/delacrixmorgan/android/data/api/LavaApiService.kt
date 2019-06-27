@@ -2,8 +2,8 @@ package com.delacrixmorgan.android.data.api
 
 import android.content.Context
 import com.delacrixmorgan.android.data.R
-import com.delacrixmorgan.android.data.model.Photo
-import com.delacrixmorgan.android.data.model.PhotoWrapper
+import com.delacrixmorgan.android.data.model.wrapper.PhotoWrapper
+import com.delacrixmorgan.android.data.model.wrapper.SearchWrapper
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -46,4 +46,8 @@ interface LavaApiService {
 
     @GET("photos/random")
     fun loadRandomPhotos(@Query("count") count: Int = 3, @Query("page") page: Int = 1): Call<Array<PhotoWrapper>>
+
+
+    @GET("photos/random")
+    fun searchPhotos(@Query("query") query: String, @Query("page") page: Int = 1): Call<Array<SearchWrapper>>
 }

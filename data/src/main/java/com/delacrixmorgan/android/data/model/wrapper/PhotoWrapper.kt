@@ -1,4 +1,6 @@
-package com.delacrixmorgan.android.data.model
+package com.delacrixmorgan.android.data.model.wrapper
+
+import com.delacrixmorgan.android.data.model.User
 
 /**
  *  PhotoWrapper

@@ -3,7 +3,7 @@ package com.delacrixmorgan.android.data
 import com.delacrixmorgan.android.data.controller.PhotoDataController
 import com.delacrixmorgan.android.data.controller.UserDataController
 import com.delacrixmorgan.android.data.model.Photo
-import com.delacrixmorgan.android.data.model.PhotoWrapper
+import com.delacrixmorgan.android.data.model.wrapper.PhotoWrapper
 import com.delacrixmorgan.android.data.model.User
 
 /**

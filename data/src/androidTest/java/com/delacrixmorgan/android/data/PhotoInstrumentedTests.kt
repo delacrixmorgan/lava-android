@@ -6,7 +6,8 @@ import com.delacrixmorgan.android.data.api.LavaApiService
 import com.delacrixmorgan.android.data.api.LavaRestClient
 import com.delacrixmorgan.android.data.controller.PhotoDataController
 import com.delacrixmorgan.android.data.model.Photo
-import com.delacrixmorgan.android.data.model.PhotoWrapper
+import com.delacrixmorgan.android.data.model.wrapper.PhotoWrapper
+import com.delacrixmorgan.android.data.model.wrapper.SearchWrapper
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,6 +64,28 @@ class PhotoInstrumentedTests {
                 signal.countDown()
             }
         })
+
+        signal.await()
+    }
+
+    @Test
+    fun searchPhotos() {
+        val signal = CountDownLatch(1)
+        val query = "Beach"
+
+        LavaApiService.create(this.appContext)
+                .searchPhotos(query)
+                .enqueue(object : Callback<Array<SearchWrapper>> {
+                    override fun onResponse(call: Call<Array<SearchWrapper>>, response: Response<Array<SearchWrapper>>) {
+                        Assert.assertTrue("Response Body is Empty", response.body() != null)
+                        signal.countDown()
+                    }
+
+                    override fun onFailure(call: Call<Array<SearchWrapper>>, t: Throwable) {
+                        Assert.fail(t.message)
+                        signal.countDown()
+                    }
+                })
 
         signal.await()
     }

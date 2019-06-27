@@ -4,7 +4,7 @@ import android.content.Context
 import com.delacrixmorgan.android.data.api.LavaApiService
 import com.delacrixmorgan.android.data.api.LavaRestClient
 import com.delacrixmorgan.android.data.model.Photo
-import com.delacrixmorgan.android.data.model.PhotoWrapper
+import com.delacrixmorgan.android.data.model.wrapper.PhotoWrapper
 import com.delacrixmorgan.android.data.processPhotos
 import retrofit2.Call
 import retrofit2.Callback
@@ -50,6 +50,10 @@ object PhotoDataController {
                         listener.onComplete(error = Exception(t.message))
                     }
                 })
+    }
+
+    fun searchPhotos(){
+
     }
 
     fun processResponse(incomingItems: List<Photo>) {
