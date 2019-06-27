@@ -2,15 +2,14 @@ package com.delacrixmorgan.android.lava.photo.grid
 
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.SharedElementCallback
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionInflater
 import androidx.transition.TransitionSet
@@ -20,6 +19,7 @@ import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.lava.R
 import com.delacrixmorgan.android.lava.common.AspectRatioGridLayoutManager
 import com.delacrixmorgan.android.lava.compatColor
+import com.delacrixmorgan.android.lava.hideSoftInputKeyboard
 import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.delacrixmorgan.android.lava.photo.detail.PhotoListFragment
 import com.github.piasy.biv.BigImageViewer
@@ -48,15 +48,40 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
     }
 
-    private lateinit var layoutManager: AspectRatioGridLayoutManager
+    private lateinit var searchView: SearchView
     private lateinit var adapter: GridPhotoRecyclerViewAdapter
+    private lateinit var layoutManager: AspectRatioGridLayoutManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_grid_photo_list, container, false)
     }
 
+    private fun setupToolbar() {
+        val activity = requireActivity() as AppCompatActivity
+        activity.setSupportActionBar(this.toolbar)
+        activity.supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeButtonEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_menu)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == android.R.id.home) {
+            this.drawerLayout.openDrawer(Gravity.START)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolbar()
         prepareTransitions()
 
         if (this.viewModel.displayMetrics == null) {
@@ -115,6 +140,39 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         if (savedInstanceState != null) {
             restorePhotoListFragment()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.menu_search, menu)
+
+        menu?.findItem(R.id.actionSearch)?.let {
+            setupSearchView(it)
+        }
+    }
+
+    private fun setupSearchView(searchMenuItem: MenuItem) {
+        this.searchView = searchMenuItem.actionView as SearchView
+        this.searchView.queryHint = "Search.."
+
+        this.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (!hasFocus && this.isVisible) {
+                hideSoftInputKeyboard()
+            }
+        }
+
+        this.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                searchView.clearFocus()
+//                updateDataSet(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+//                updateDataSet(newText)
+                return true
+            }
+        })
     }
 
     private fun restorePhotoListFragment() {

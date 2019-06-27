@@ -1,7 +1,10 @@
 package com.delacrixmorgan.android.lava
 
 import android.content.Context
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 
 /**
  * LavaExtensions
@@ -17,4 +20,13 @@ fun Int.compatColor(context: Context?): Int {
     } else {
         ContextCompat.getColor(context, this)
     }
+}
+
+fun Fragment.hideSoftInputKeyboard() {
+    this.view?.hideSoftInputKeyboard()
+}
+
+fun View.hideSoftInputKeyboard() {
+    val inputManager = this.context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputManager.hideSoftInputFromWindow(this.windowToken, 0)
 }

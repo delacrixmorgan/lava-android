@@ -5,7 +5,20 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+    </style>
+
+    <style name="LavaAppbar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="contentInsetLeft">16dp</item>
+        <item name="contentInsetStart">16dp</item>
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="actionMenuTextColor">@color/colorSecondaryText</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_menu</item>
     </style>
 
     <style name="LargeTitle" parent="Base.TextAppearance.AppCompat.Title">
