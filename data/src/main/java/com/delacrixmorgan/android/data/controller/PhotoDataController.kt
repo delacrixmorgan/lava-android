@@ -33,6 +33,26 @@ object PhotoDataController {
         return filteredItems
     }
 
+    fun loadCuratedPhotos(context: Context, page: Int, itemCount: Int = 30, listener: LavaRestClient.LoadListListener<Photo>) {
+        LavaApiService.create(context)
+                .loadCuratedPhotos(page = page, itemCount = itemCount)
+                .enqueue(object : Callback<Array<PhotoWrapper>> {
+                    override fun onResponse(call: Call<Array<PhotoWrapper>>, response: Response<Array<PhotoWrapper>>) {
+                        val incomingPhotos = response.body()?.toList()
+                        if (incomingPhotos != null) {
+                            val photos = incomingPhotos.processPhotos()
+                            listener.onComplete(list = photos)
+                        } else {
+                            listener.onComplete(error = Exception("${response.errorBody()?.string()}"))
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Array<PhotoWrapper>>, t: Throwable) {
+                        listener.onComplete(error = Exception(t.message))
+                    }
+                })
+    }
+
     fun loadRandomPhotos(context: Context, itemCount: Int = 30, listener: LavaRestClient.LoadListListener<Photo>) {
         LavaApiService.create(context)
                 .loadRandomPhotos(itemCount)

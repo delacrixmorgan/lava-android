@@ -44,8 +44,18 @@ interface LavaApiService {
         }
     }
 
+    @GET("photos/curated")
+    fun loadCuratedPhotos(
+            @Query("page") page: Int,
+            @Query("per_page") itemCount: Int,
+            @Query("order_by") orderBy: String = "latest"
+    ): Call<Array<PhotoWrapper>>
+
     @GET("photos/random")
-    fun loadRandomPhotos(@Query("count") count: Int = 3, @Query("page") page: Int = 1): Call<Array<PhotoWrapper>>
+    fun loadRandomPhotos(
+            @Query("count") count: Int = 3,
+            @Query("page") page: Int = 1
+    ): Call<Array<PhotoWrapper>>
 
     @GET("search/photos")
     fun searchPhotos(
