@@ -2,6 +2,7 @@ package com.delacrixmorgan.android.lava.photo.grid
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -45,12 +46,12 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         private const val SPAN_COUNT = 3
     }
 
+    private var searchView: SearchView? = null
     private val enterTransitionStarted = AtomicBoolean()
     private val viewModel: PhotoViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
     }
 
-    private lateinit var searchView: SearchView
     private lateinit var adapter: GridPhotoRecyclerViewAdapter
     private lateinit var layoutManager: AspectRatioGridLayoutManager
 
@@ -114,7 +115,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         this.swipeRefreshLayout.setOnRefreshListener {
             this.viewModel.collage.clear()
             this.adapter.removeDataSet()
-            
+
             this.swipeRefreshLayout.performHapticContextClick()
             refreshFromServer()
         }
@@ -129,34 +130,60 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        super.onCreateOptionsMenu(menu, inflater)
         inflater?.inflate(R.menu.menu_search, menu)
 
         menu?.findItem(R.id.actionSearch)?.let {
             setupSearchView(it)
         }
+
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun setupSearchView(searchMenuItem: MenuItem) {
         this.searchView = searchMenuItem.actionView as SearchView
-        this.searchView.queryHint = "Search.."
+        this.searchView?.queryHint = "Search.."
 
-        this.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+        if (this.viewModel.queryText?.isNotBlank() == true) {
+            this.searchView?.onActionViewExpanded()
+            this.searchView?.setQuery(this.viewModel.queryText, true)
+        }
+
+        this.searchView?.setOnQueryTextFocusChangeListener { _, hasFocus ->
             if (!hasFocus && this.isVisible) {
                 hideSoftInputKeyboard()
             }
         }
 
-        this.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        val queryTimer = object : CountDownTimer(1500, 1000) {
+            override fun onTick(remainingSeconds: Long) = Unit
+            override fun onFinish() {
+                viewModel.collage.clear()
+                adapter.removeDataSet()
+                searchFromServer(viewModel.queryText)
+            }
+        }
+
+        this.searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                searchView.clearFocus()
+                viewModel.queryText = query
+                searchView?.clearFocus()
+
+                queryTimer.cancel()
+                queryTimer.onFinish()
+
                 hideSoftInputKeyboard()
-                searchFromServer(query)
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                searchFromServer(newText)
+                if (searchView?.isIconified == true || !isVisible) {
+                    return false
+                }
+
+                queryTimer.cancel()
+                queryTimer.start()
+
+                viewModel.queryText = newText
                 return true
             }
         })
@@ -170,6 +197,81 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
             setHomeButtonEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
+    }
+
+    private fun restorePhotoListFragment() {
+        this.activity?.supportFragmentManager?.apply {
+            findFragmentByTag(PhotoListFragment::class.java.simpleName)?.let { fragment ->
+                transaction {
+                    replace(R.id.mainContainer, fragment)
+                    addToBackStack(fragment::class.java.simpleName)
+                }
+            }
+        }
+    }
+
+    private fun prepareTransitions() {
+        this.exitTransition = TransitionInflater.from(this.context).inflateTransition(R.transition.grid_exit_transition).apply {
+            duration = 375
+            startDelay = 25
+        }
+
+        postponeEnterTransition()
+        setExitSharedElementCallback(object : SharedElementCallback() {
+            override fun onMapSharedElements(names: MutableList<String>?, sharedElements: MutableMap<String, View>) {
+                val selectedViewHolder = recyclerView.findViewHolderForAdapterPosition(viewModel.currentPosition)
+                val firstName = names?.get(0)
+
+                if (selectedViewHolder != null && firstName != null) {
+                    sharedElements[firstName] = selectedViewHolder.itemView.findViewById(R.id.gridImageView)
+                }
+            }
+        })
+    }
+
+    private fun searchFromServer(query: String?) {
+        if (query == null) {
+            refreshFromServer()
+            return
+        }
+
+        val page = (this.adapter.itemCount / 30) + 1
+        PhotoDataController.searchPhotos(requireContext(), query = query, page = page, listener = object : LavaRestClient.LoadListListener<Photo> {
+            override fun onComplete(list: List<Photo>, error: Exception?) {
+                error?.let {
+                    Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
+                    return
+                }
+
+                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
+                viewModel.collage.addAll(list)
+                adapter.updateDataSet(list)
+            }
+        })
+    }
+
+    private fun refreshFromServer() {
+        if (this.searchView?.query?.isNotBlank() == true) {
+            searchFromServer(this.viewModel.queryText)
+            return
+        }
+
+        PhotoDataController.loadRandomPhotos(requireContext(), listener = object : LavaRestClient.LoadListListener<Photo> {
+            override fun onComplete(list: List<Photo>, error: Exception?) {
+                if (swipeRefreshLayout != null) {
+                    swipeRefreshLayout.isRefreshing = false
+                }
+
+                error?.let {
+                    Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
+                    return
+                }
+
+                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
+                viewModel.collage.addAll(list)
+                adapter.updateDataSet(list)
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -204,59 +306,6 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         }
 
         return true
-    }
-
-    private fun restorePhotoListFragment() {
-        this.activity?.supportFragmentManager?.apply {
-            findFragmentByTag(PhotoListFragment::class.java.simpleName)?.let { fragment ->
-                transaction {
-                    replace(R.id.mainContainer, fragment)
-                    addToBackStack(fragment::class.java.simpleName)
-                }
-            }
-        }
-    }
-
-    private fun prepareTransitions() {
-        this.exitTransition = TransitionInflater.from(this.context).inflateTransition(R.transition.grid_exit_transition).apply {
-            duration = 375
-            startDelay = 25
-        }
-
-        postponeEnterTransition()
-        setExitSharedElementCallback(object : SharedElementCallback() {
-            override fun onMapSharedElements(names: MutableList<String>?, sharedElements: MutableMap<String, View>) {
-                val selectedViewHolder = recyclerView.findViewHolderForAdapterPosition(viewModel.currentPosition)
-                val firstName = names?.get(0)
-
-                if (selectedViewHolder != null && firstName != null) {
-                    sharedElements[firstName] = selectedViewHolder.itemView.findViewById(R.id.gridImageView)
-                }
-            }
-        })
-    }
-
-    private fun searchFromServer(query: String?) {
-
-    }
-
-    private fun refreshFromServer() {
-        PhotoDataController.loadRandomPhotos(requireContext(), 30, listener = object : LavaRestClient.LoadListListener<Photo> {
-            override fun onComplete(list: List<Photo>, error: Exception?) {
-                if (swipeRefreshLayout != null) {
-                    swipeRefreshLayout.isRefreshing = false
-                }
-
-                error?.let {
-                    Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
-                    return
-                }
-
-                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
-                viewModel.collage.addAll(list)
-                adapter.updateDataSet(list)
-            }
-        })
     }
 
     //region GridPhotoListListener

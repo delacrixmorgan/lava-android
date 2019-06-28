@@ -5,6 +5,7 @@ import com.delacrixmorgan.android.data.api.LavaApiService
 import com.delacrixmorgan.android.data.api.LavaRestClient
 import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.data.model.wrapper.PhotoWrapper
+import com.delacrixmorgan.android.data.model.wrapper.SearchWrapper
 import com.delacrixmorgan.android.data.processPhotos
 import retrofit2.Call
 import retrofit2.Callback
@@ -32,7 +33,7 @@ object PhotoDataController {
         return filteredItems
     }
 
-    fun loadRandomPhotos(context: Context, itemCount: Int = 3, listener: LavaRestClient.LoadListListener<Photo>) {
+    fun loadRandomPhotos(context: Context, itemCount: Int = 30, listener: LavaRestClient.LoadListListener<Photo>) {
         LavaApiService.create(context)
                 .loadRandomPhotos(itemCount)
                 .enqueue(object : Callback<Array<PhotoWrapper>> {
@@ -52,8 +53,24 @@ object PhotoDataController {
                 })
     }
 
-    fun searchPhotos(){
+    fun searchPhotos(context: Context, query: String, page: Int, itemCount: Int = 30, listener: LavaRestClient.LoadListListener<Photo>) {
+        LavaApiService.create(context)
+                .searchPhotos(query = query, page = page, itemCount = itemCount)
+                .enqueue(object : Callback<SearchWrapper> {
+                    override fun onResponse(call: Call<SearchWrapper>, response: Response<SearchWrapper>) {
+                        val incomingPhotos = response.body()?.results
+                        if (incomingPhotos != null) {
+                            val photos = incomingPhotos.processPhotos()
+                            listener.onComplete(list = photos)
+                        } else {
+                            listener.onComplete(error = Exception("${response.errorBody()?.string()}"))
+                        }
+                    }
 
+                    override fun onFailure(call: Call<SearchWrapper>, t: Throwable) {
+                        listener.onComplete(error = Exception(t.message))
+                    }
+                })
     }
 
     fun processResponse(incomingItems: List<Photo>) {

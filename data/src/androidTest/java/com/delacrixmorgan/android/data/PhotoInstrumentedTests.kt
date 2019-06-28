@@ -74,14 +74,14 @@ class PhotoInstrumentedTests {
         val query = "Beach"
 
         LavaApiService.create(this.appContext)
-                .searchPhotos(query)
-                .enqueue(object : Callback<Array<SearchWrapper>> {
-                    override fun onResponse(call: Call<Array<SearchWrapper>>, response: Response<Array<SearchWrapper>>) {
+                .searchPhotos(query = query, page = 1, itemCount = 30)
+                .enqueue(object : Callback<SearchWrapper> {
+                    override fun onResponse(call: Call<SearchWrapper>, response: Response<SearchWrapper>) {
                         Assert.assertTrue("Response Body is Empty", response.body() != null)
                         signal.countDown()
                     }
 
-                    override fun onFailure(call: Call<Array<SearchWrapper>>, t: Throwable) {
+                    override fun onFailure(call: Call<SearchWrapper>, t: Throwable) {
                         Assert.fail(t.message)
                         signal.countDown()
                     }

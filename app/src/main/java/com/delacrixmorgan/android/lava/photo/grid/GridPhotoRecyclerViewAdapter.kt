@@ -16,6 +16,8 @@ import com.bumptech.glide.request.target.Target
 import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.lava.R
 import kotlinx.android.synthetic.main.cell_photo.view.*
+import java.util.ArrayList
+import java.util.HashSet
 
 /**
  * GridPhotoRecyclerViewAdapter
@@ -29,7 +31,7 @@ class GridPhotoRecyclerViewAdapter(
         private val maxHeight: Int,
         private val listener: GridPhotoListListener
 ) : RecyclerView.Adapter<GridPhotoRecyclerViewAdapter.PhotoItemViewHolder>() {
-    private val photos = arrayListOf<Photo>()
+    private var photos = arrayListOf<Photo>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoItemViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.cell_photo, parent, false)
@@ -47,13 +49,28 @@ class GridPhotoRecyclerViewAdapter(
 
     fun updateDataSet(photos: List<Photo>) {
         val previousPosition = this.photos.size
-        this.photos.addAll(photos)
+        insert(photos)
         notifyItemInserted(previousPosition)
     }
 
     fun removeDataSet() {
         this.photos.clear()
         notifyDataSetChanged()
+    }
+
+    private fun insert(incomingItems: List<Photo>) {
+        val incomingInts = HashSet<String>()
+        incomingItems.forEach { incomingInts.add(it.id) }
+
+        val existingMinusIncomingInts = this.photos.filter { !incomingInts.contains(it.id) }
+        val uniqueIncomingItems = arrayListOf<Photo>()
+
+        incomingInts.forEach { id ->
+            incomingItems.find { it.id == id }?.let {
+                uniqueIncomingItems.add(it)
+            }
+        }
+        this.photos = ArrayList(existingMinusIncomingInts + uniqueIncomingItems)
     }
 
     inner class PhotoItemViewHolder(itemView: View, listener: GridPhotoListListener) : RecyclerView.ViewHolder(itemView) {

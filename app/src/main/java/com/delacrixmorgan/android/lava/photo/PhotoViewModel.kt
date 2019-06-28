@@ -13,9 +13,11 @@ import com.delacrixmorgan.android.data.model.Photo
  */
 
 class PhotoViewModel : ViewModel() {
-    var displayMetrics: DisplayMetrics? = null
     var currentPosition = 0
     var collage = arrayListOf<Photo>()
+
+    var queryText: String? = null
+    var displayMetrics: DisplayMetrics? = null
 
     val widthPixels: Int
         get() {

@@ -47,7 +47,10 @@ interface LavaApiService {
     @GET("photos/random")
     fun loadRandomPhotos(@Query("count") count: Int = 3, @Query("page") page: Int = 1): Call<Array<PhotoWrapper>>
 
-
-    @GET("photos/random")
-    fun searchPhotos(@Query("query") query: String, @Query("page") page: Int = 1): Call<Array<SearchWrapper>>
+    @GET("search/photos")
+    fun searchPhotos(
+            @Query("query") query: String,
+            @Query("page") page: Int,
+            @Query("per_page") itemCount: Int
+    ): Call<SearchWrapper>
 }

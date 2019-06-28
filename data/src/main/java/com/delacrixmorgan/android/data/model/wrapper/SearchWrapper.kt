@@ -16,5 +16,5 @@ data class SearchWrapper(
         @field:Json(name = "total_pages")
         val totalPages: Int,
         @field:Json(name = "results")
-        val photos: List<PhotoWrapper>
+        val results: List<PhotoWrapper>
 )
