@@ -21,6 +21,7 @@ import com.delacrixmorgan.android.lava.R
 import com.delacrixmorgan.android.lava.common.AspectRatioGridLayoutManager
 import com.delacrixmorgan.android.lava.compatColor
 import com.delacrixmorgan.android.lava.hideSoftInputKeyboard
+import com.delacrixmorgan.android.lava.performHapticContextClick
 import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.delacrixmorgan.android.lava.photo.detail.PhotoListFragment
 import com.github.piasy.biv.BigImageViewer
@@ -113,6 +114,8 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         this.swipeRefreshLayout.setOnRefreshListener {
             this.viewModel.collage.clear()
             this.adapter.removeDataSet()
+            
+            this.swipeRefreshLayout.performHapticContextClick()
             refreshFromServer()
         }
 
