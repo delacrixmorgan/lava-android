@@ -3,6 +3,7 @@ package com.delacrixmorgan.android.data.controller
 import android.content.Context
 import com.delacrixmorgan.android.data.api.LavaApiService
 import com.delacrixmorgan.android.data.api.LavaRestClient
+import com.delacrixmorgan.android.data.model.CuratedType
 import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.data.model.wrapper.PhotoWrapper
 import com.delacrixmorgan.android.data.model.wrapper.SearchWrapper
@@ -33,9 +34,9 @@ object PhotoDataController {
         return filteredItems
     }
 
-    fun loadCuratedPhotos(context: Context, page: Int, itemCount: Int = 30, listener: LavaRestClient.LoadListListener<Photo>) {
+    fun loadCuratedPhotos(context: Context, page: Int, itemCount: Int = 30, curatedType: CuratedType, listener: LavaRestClient.LoadListListener<Photo>) {
         LavaApiService.create(context)
-                .loadCuratedPhotos(page = page, itemCount = itemCount)
+                .loadCuratedPhotos(page = page, itemCount = itemCount, orderBy = curatedType.name.toLowerCase())
                 .enqueue(object : Callback<Array<PhotoWrapper>> {
                     override fun onResponse(call: Call<Array<PhotoWrapper>>, response: Response<Array<PhotoWrapper>>) {
                         val incomingPhotos = response.body()?.toList()
