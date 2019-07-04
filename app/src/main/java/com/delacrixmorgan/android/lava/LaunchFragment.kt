@@ -25,9 +25,9 @@ class LaunchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val gridPhotoListFragment = GridPhotoListFragment()
+        val searchMenuFragment = SearchMenuFragment()
         this.activity?.supportFragmentManager?.transaction {
-            replace(R.id.mainContainer, gridPhotoListFragment, gridPhotoListFragment::class.java.simpleName)
+            replace(R.id.mainContainer, searchMenuFragment, searchMenuFragment::class.java.simpleName)
         }
     }
 }
