@@ -45,6 +45,10 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     companion object {
         private const val GRID_LAYOUT_ASPECT_RATIO = 1.6F
         private const val SPAN_COUNT = 3
+
+        fun newInstance(): GridPhotoListFragment {
+            return GridPhotoListFragment()
+        }
     }
 
     private var searchView: SearchView? = null
@@ -67,7 +71,6 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupToolbar()
         prepareTransitions()
 
         if (this.viewModel.displayMetrics == null) {
@@ -130,75 +133,75 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.menu_search, menu)
+//    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+//        inflater?.inflate(R.menu.menu_search, menu)
+//
+//        menu?.findItem(R.id.actionSearch)?.let {
+//            setupSearchView(it)
+//        }
+//
+//        super.onCreateOptionsMenu(menu, inflater)
+//    }
 
-        menu?.findItem(R.id.actionSearch)?.let {
-            setupSearchView(it)
-        }
+//    private fun setupSearchView(searchMenuItem: MenuItem) {
+//        this.searchView = searchMenuItem.actionView as SearchView
+//        this.searchView?.queryHint = "Search.."
+//
+//        if (this.viewModel.queryText?.isNotBlank() == true) {
+//            this.searchView?.onActionViewExpanded()
+//            this.searchView?.setQuery(this.viewModel.queryText, true)
+//        }
+//
+//        this.searchView?.setOnQueryTextFocusChangeListener { _, hasFocus ->
+//            if (!hasFocus && this.isVisible) {
+//                hideSoftInputKeyboard()
+//            }
+//        }
+//
+//        val queryTimer = object : CountDownTimer(1500, 1000) {
+//            override fun onTick(remainingSeconds: Long) = Unit
+//            override fun onFinish() {
+//                viewModel.collage.clear()
+//                adapter.removeDataSet()
+//                searchFromServer(viewModel.queryText)
+//            }
+//        }
+//
+//        this.searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+//            override fun onQueryTextSubmit(query: String?): Boolean {
+//                viewModel.queryText = query
+//                searchView?.clearFocus()
+//
+//                queryTimer.cancel()
+//                queryTimer.onFinish()
+//
+//                hideSoftInputKeyboard()
+//                return true
+//            }
+//
+//            override fun onQueryTextChange(newText: String?): Boolean {
+//                if (searchView?.isIconified == true || !isVisible) {
+//                    return false
+//                }
+//
+//                queryTimer.cancel()
+//                queryTimer.start()
+//
+//                viewModel.queryText = newText
+//                return true
+//            }
+//        })
+//    }
 
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    private fun setupSearchView(searchMenuItem: MenuItem) {
-        this.searchView = searchMenuItem.actionView as SearchView
-        this.searchView?.queryHint = "Search.."
-
-        if (this.viewModel.queryText?.isNotBlank() == true) {
-            this.searchView?.onActionViewExpanded()
-            this.searchView?.setQuery(this.viewModel.queryText, true)
-        }
-
-        this.searchView?.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            if (!hasFocus && this.isVisible) {
-                hideSoftInputKeyboard()
-            }
-        }
-
-        val queryTimer = object : CountDownTimer(1500, 1000) {
-            override fun onTick(remainingSeconds: Long) = Unit
-            override fun onFinish() {
-                viewModel.collage.clear()
-                adapter.removeDataSet()
-                searchFromServer(viewModel.queryText)
-            }
-        }
-
-        this.searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                viewModel.queryText = query
-                searchView?.clearFocus()
-
-                queryTimer.cancel()
-                queryTimer.onFinish()
-
-                hideSoftInputKeyboard()
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (searchView?.isIconified == true || !isVisible) {
-                    return false
-                }
-
-                queryTimer.cancel()
-                queryTimer.start()
-
-                viewModel.queryText = newText
-                return true
-            }
-        })
-    }
-
-    private fun setupToolbar() {
-        val activity = requireActivity() as AppCompatActivity
-        activity.setSupportActionBar(this.toolbar)
-        activity.supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeButtonEnabled(true)
-            setHomeAsUpIndicator(R.drawable.ic_menu)
-        }
-    }
+//    private fun setupToolbar() {
+//        val activity = requireActivity() as AppCompatActivity
+//        activity.setSupportActionBar(this.toolbar)
+//        activity.supportActionBar?.apply {
+//            setDisplayHomeAsUpEnabled(true)
+//            setHomeButtonEnabled(true)
+//            setHomeAsUpIndicator(R.drawable.ic_menu)
+//        }
+//    }
 
     private fun restorePhotoListFragment() {
         this.activity?.supportFragmentManager?.apply {
@@ -274,40 +277,6 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
                 adapter.updateDataSet(list)
             }
         })
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            android.R.id.home -> {
-                this.drawerLayout.openDrawer(GravityCompat.START)
-            }
-
-            R.id.grid -> {
-
-            }
-
-            R.id.staggered -> {
-
-            }
-
-            R.id.credits -> {
-
-            }
-
-            R.id.support -> {
-
-            }
-
-            R.id.sourceCode -> {
-
-            }
-
-            else -> {
-                return super.onOptionsItemSelected(item)
-            }
-        }
-
-        return true
     }
 
     //region GridPhotoListListener

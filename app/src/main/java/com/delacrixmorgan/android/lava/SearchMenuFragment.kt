@@ -1,10 +1,18 @@
 package com.delacrixmorgan.android.lava
 
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.transaction
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.delacrixmorgan.android.lava.photo.grid.GridPhotoListFragment
+import kotlinx.android.synthetic.main.fragment_search_menu.*
 
 /**
  * SearchMenuFragment
@@ -17,5 +25,31 @@ import androidx.fragment.app.Fragment
 class SearchMenuFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_search_menu, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val backgroundSrc = "https://images.unsplash.com/photo-1548588627-f978862b85e1?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1351&q=80"
+
+        Glide.with(view.context)
+                .load(backgroundSrc)
+                .apply(RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .dontTransform())
+                .into(this.backgroundImageView)
+
+        val colorMatrix = ColorMatrix()
+        colorMatrix.setSaturation(0.2F)
+
+        this.backgroundImageView.colorFilter = ColorMatrixColorFilter(colorMatrix)
+
+        this.randomButton.setOnClickListener {
+            val fragment = GridPhotoListFragment.newInstance()
+            this.activity?.supportFragmentManager?.transaction {
+                replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
+                addToBackStack(fragment::class.java.simpleName)
+            }
+        }
     }
 }
