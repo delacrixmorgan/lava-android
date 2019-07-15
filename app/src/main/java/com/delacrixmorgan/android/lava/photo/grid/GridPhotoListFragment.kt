@@ -2,12 +2,10 @@ package com.delacrixmorgan.android.lava.photo.grid
 
 import android.net.Uri
 import android.os.Bundle
-import android.os.CountDownTimer
-import android.view.*
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.app.SharedElementCallback
-import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
@@ -22,7 +20,6 @@ import com.delacrixmorgan.android.data.model.Photo
 import com.delacrixmorgan.android.lava.R
 import com.delacrixmorgan.android.lava.common.AspectRatioGridLayoutManager
 import com.delacrixmorgan.android.lava.compatColor
-import com.delacrixmorgan.android.lava.hideSoftInputKeyboard
 import com.delacrixmorgan.android.lava.performHapticContextClick
 import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.delacrixmorgan.android.lava.photo.detail.PhotoListFragment
@@ -51,7 +48,6 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         }
     }
 
-    private var searchView: SearchView? = null
     private val enterTransitionStarted = AtomicBoolean()
     private val viewModel: PhotoViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
@@ -59,11 +55,6 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
     private lateinit var adapter: GridPhotoRecyclerViewAdapter
     private lateinit var layoutManager: AspectRatioGridLayoutManager
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_grid_photo_list, container, false)
@@ -208,7 +199,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
             findFragmentByTag(PhotoListFragment::class.java.simpleName)?.let { fragment ->
                 transaction {
                     replace(R.id.mainContainer, fragment)
-                    addToBackStack(fragment::class.java.simpleName)
+                    addToBackStack(null)
                 }
             }
         }
@@ -233,32 +224,32 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         })
     }
 
-    private fun searchFromServer(query: String?) {
-        if (query == null) {
-            refreshFromServer()
-            return
-        }
-
-        val page = (this.adapter.itemCount / 30) + 1
-        PhotoDataController.searchPhotos(requireContext(), query = query, page = page, listener = object : LavaRestClient.LoadListListener<Photo> {
-            override fun onComplete(list: List<Photo>, error: Exception?) {
-                error?.let {
-                    Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
-                    return
-                }
-
-                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
-                viewModel.collage.addAll(list)
-                adapter.updateDataSet(list)
-            }
-        })
-    }
+//    private fun searchFromServer(query: String?) {
+//        if (query == null) {
+//            refreshFromServer()
+//            return
+//        }
+//
+//        val page = (this.adapter.itemCount / 30) + 1
+//        PhotoDataController.searchPhotos(requireContext(), query = query, page = page, listener = object : LavaRestClient.LoadListListener<Photo> {
+//            override fun onComplete(list: List<Photo>, error: Exception?) {
+//                error?.let {
+//                    Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
+//                    return
+//                }
+//
+//                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
+//                viewModel.collage.addAll(list)
+//                adapter.updateDataSet(list)
+//            }
+//        })
+//    }
 
     private fun refreshFromServer() {
-        if (this.searchView?.query?.isNotBlank() == true) {
-            searchFromServer(this.viewModel.queryText)
-            return
-        }
+//        if (this.searchView?.query?.isNotBlank() == true) {
+//            searchFromServer(this.viewModel.queryText)
+//            return
+//        }
 
         val page = (this.adapter.itemCount / 30) + 1
         PhotoDataController.loadCuratedPhotos(requireContext(), page = page, curatedType = CuratedType.POPULAR, listener = object : LavaRestClient.LoadListListener<Photo> {
@@ -273,8 +264,12 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
                 }
 
                 BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
+
+                val previousPosition = viewModel.collage.size
+
                 viewModel.collage.addAll(list)
-                adapter.updateDataSet(list)
+                adapter.updateDataSet(viewModel.collage)
+                recyclerView.smoothScrollToPosition(previousPosition)
             }
         })
     }
@@ -291,7 +286,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         this.activity?.supportFragmentManager?.transaction {
             addSharedElement(viewHolder.gridImageView, transitionName)
             replace(R.id.mainContainer, imageListFragment)
-            addToBackStack(imageListFragment::class.java.simpleName)
+            addToBackStack(null)
         }
     }
 

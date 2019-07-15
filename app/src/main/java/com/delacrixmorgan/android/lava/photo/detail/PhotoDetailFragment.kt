@@ -66,7 +66,7 @@ class PhotoDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL)
+        val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL).dontTransform()
 
         ViewCompat.setTransitionName(this.gridImageView, this.photo?.getUrl(Photo.UrlType.THUMB))
         Glide.with(view.context)

@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
-import com.delacrixmorgan.android.lava.photo.grid.GridPhotoListFragment
 
 /**
  * LaunchFragment
