@@ -37,6 +37,7 @@ class SearchMenuFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        updateActionButtonIcon()
 
         val backgroundSrc = "https://images.unsplash.com/photo-1548588627-f978862b85e1?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1351&q=80"
 
@@ -76,6 +77,7 @@ class SearchMenuFragment : Fragment() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 viewModel.queryText = newText
+                updateActionButtonIcon()
                 return true
             }
         })
@@ -83,6 +85,14 @@ class SearchMenuFragment : Fragment() {
         this.actionButton.setOnClickListener {
             hideSoftInputKeyboard()
             launchGridPhotoListFragment()
+        }
+    }
+
+    private fun updateActionButtonIcon() {
+        if (this.viewModel.queryText.isNullOrBlank()) {
+            this.actionButton.setImageResource(R.drawable.ic_arrow_down)
+        } else {
+            this.actionButton.setImageResource(R.drawable.ic_search)
         }
     }
 
