@@ -6,11 +6,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
+import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.delacrixmorgan.android.lava.photo.grid.GridPhotoListFragment
 import kotlinx.android.synthetic.main.fragment_search_menu.*
 
@@ -23,6 +26,11 @@ import kotlinx.android.synthetic.main.fragment_search_menu.*
  */
 
 class SearchMenuFragment : Fragment() {
+
+    private val viewModel: PhotoViewModel by lazy {
+        ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_search_menu, container, false)
     }
@@ -44,12 +52,46 @@ class SearchMenuFragment : Fragment() {
 
         this.backgroundImageView.colorFilter = ColorMatrixColorFilter(colorMatrix)
 
-        this.randomButton.setOnClickListener {
-            val fragment = GridPhotoListFragment.newInstance()
-            this.activity?.supportFragmentManager?.transaction {
-                replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
-                addToBackStack(fragment::class.java.simpleName)
+        this.searchView.setQuery(this.viewModel.queryText, true)
+
+        this.searchViewCardView.setOnClickListener {
+            this.searchView.isFocusable = true
+            this.searchView.isIconified = false
+            this.searchView.requestFocusFromTouch()
+        }
+
+        this.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (!hasFocus && this.isVisible) {
+                hideSoftInputKeyboard()
             }
+        }
+
+        this.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.queryText = query
+                hideSoftInputKeyboard()
+                launchGridPhotoListFragment()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.queryText = newText
+                return true
+            }
+        })
+
+        this.actionButton.setOnClickListener {
+            hideSoftInputKeyboard()
+            launchGridPhotoListFragment()
+        }
+    }
+
+    private fun launchGridPhotoListFragment() {
+        val fragment = GridPhotoListFragment.newInstance()
+        this.viewModel.collage.clear()
+        this.activity?.supportFragmentManager?.transaction {
+            replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
+            addToBackStack(fragment::class.java.simpleName)
         }
     }
 }

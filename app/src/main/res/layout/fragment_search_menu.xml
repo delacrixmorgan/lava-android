@@ -46,12 +46,14 @@
         </FrameLayout>
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/searchViewCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="4dp"
             app:cardElevation="8dp">
 
             <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:iconifiedByDefault="false" />
@@ -59,7 +61,7 @@
     </LinearLayout>
 
     <ImageButton
-        android:id="@+id/randomButton"
+        android:id="@+id/actionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"

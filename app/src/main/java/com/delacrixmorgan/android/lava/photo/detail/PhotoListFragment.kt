@@ -47,7 +47,8 @@ class PhotoListFragment : Fragment(), ViewPager.OnPageChangeListener {
             postponeEnterTransition()
         }
 
-        this.adapter = PhotoViewPagerAdapter(this, this.viewModel.collage)
+        val photos = this.viewModel.collage
+        this.adapter = PhotoViewPagerAdapter(this, photos)
 
         this.viewPager.adapter = this.adapter
         this.viewPager.offscreenPageLimit = 3

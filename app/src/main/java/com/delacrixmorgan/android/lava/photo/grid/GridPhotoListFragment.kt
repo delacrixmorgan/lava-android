@@ -49,12 +49,15 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     }
 
     private val enterTransitionStarted = AtomicBoolean()
-    private val viewModel: PhotoViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
-    }
 
+    private lateinit var viewModel: PhotoViewModel
     private lateinit var adapter: GridPhotoRecyclerViewAdapter
     private lateinit var layoutManager: AspectRatioGridLayoutManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        this.viewModel = ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_grid_photo_list, container, false)
@@ -124,76 +127,6 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         }
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-//        inflater?.inflate(R.menu.menu_search, menu)
-//
-//        menu?.findItem(R.id.actionSearch)?.let {
-//            setupSearchView(it)
-//        }
-//
-//        super.onCreateOptionsMenu(menu, inflater)
-//    }
-
-//    private fun setupSearchView(searchMenuItem: MenuItem) {
-//        this.searchView = searchMenuItem.actionView as SearchView
-//        this.searchView?.queryHint = "Search.."
-//
-//        if (this.viewModel.queryText?.isNotBlank() == true) {
-//            this.searchView?.onActionViewExpanded()
-//            this.searchView?.setQuery(this.viewModel.queryText, true)
-//        }
-//
-//        this.searchView?.setOnQueryTextFocusChangeListener { _, hasFocus ->
-//            if (!hasFocus && this.isVisible) {
-//                hideSoftInputKeyboard()
-//            }
-//        }
-//
-//        val queryTimer = object : CountDownTimer(1500, 1000) {
-//            override fun onTick(remainingSeconds: Long) = Unit
-//            override fun onFinish() {
-//                viewModel.collage.clear()
-//                adapter.removeDataSet()
-//                searchFromServer(viewModel.queryText)
-//            }
-//        }
-//
-//        this.searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-//            override fun onQueryTextSubmit(query: String?): Boolean {
-//                viewModel.queryText = query
-//                searchView?.clearFocus()
-//
-//                queryTimer.cancel()
-//                queryTimer.onFinish()
-//
-//                hideSoftInputKeyboard()
-//                return true
-//            }
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                if (searchView?.isIconified == true || !isVisible) {
-//                    return false
-//                }
-//
-//                queryTimer.cancel()
-//                queryTimer.start()
-//
-//                viewModel.queryText = newText
-//                return true
-//            }
-//        })
-//    }
-
-//    private fun setupToolbar() {
-//        val activity = requireActivity() as AppCompatActivity
-//        activity.setSupportActionBar(this.toolbar)
-//        activity.supportActionBar?.apply {
-//            setDisplayHomeAsUpEnabled(true)
-//            setHomeButtonEnabled(true)
-//            setHomeAsUpIndicator(R.drawable.ic_menu)
-//        }
-//    }
-
     private fun restorePhotoListFragment() {
         this.activity?.supportFragmentManager?.apply {
             findFragmentByTag(PhotoListFragment::class.java.simpleName)?.let { fragment ->
@@ -224,32 +157,35 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         })
     }
 
-//    private fun searchFromServer(query: String?) {
-//        if (query == null) {
-//            refreshFromServer()
-//            return
-//        }
-//
-//        val page = (this.adapter.itemCount / 30) + 1
-//        PhotoDataController.searchPhotos(requireContext(), query = query, page = page, listener = object : LavaRestClient.LoadListListener<Photo> {
-//            override fun onComplete(list: List<Photo>, error: Exception?) {
-//                error?.let {
-//                    Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
-//                    return
-//                }
-//
-//                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
-//                viewModel.collage.addAll(list)
-//                adapter.updateDataSet(list)
-//            }
-//        })
-//    }
+    private fun searchFromServer(query: String?) {
+        if (query == null) {
+            refreshFromServer()
+            return
+        }
+
+        val page = (this.adapter.itemCount / 30) + 1
+        PhotoDataController.searchPhotos(requireContext(), query = query, page = page, listener = object : LavaRestClient.LoadListListener<Photo> {
+            override fun onComplete(list: List<Photo>, error: Exception?) {
+                error?.let {
+                    Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
+                    return
+                }
+
+                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
+                val previousPosition = viewModel.collage.size
+
+                viewModel.collage.addAll(list)
+                adapter.updateDataSet(viewModel.collage)
+                recyclerView.smoothScrollToPosition(previousPosition)
+            }
+        })
+    }
 
     private fun refreshFromServer() {
-//        if (this.searchView?.query?.isNotBlank() == true) {
-//            searchFromServer(this.viewModel.queryText)
-//            return
-//        }
+        if (this.viewModel.queryText?.isNotBlank() == true) {
+            searchFromServer(this.viewModel.queryText)
+            return
+        }
 
         val page = (this.adapter.itemCount / 30) + 1
         PhotoDataController.loadCuratedPhotos(requireContext(), page = page, curatedType = CuratedType.POPULAR, listener = object : LavaRestClient.LoadListListener<Photo> {
