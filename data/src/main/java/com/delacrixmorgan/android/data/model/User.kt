@@ -16,4 +16,18 @@ data class User(
         val links: Map<String, String>,
         @field:Json(name = "profile_image")
         val profileImage: Map<String, String>
-)
+) {
+    fun getLink(linkType: LinkType): String {
+        return links[linkType.name.toLowerCase()].toString()
+    }
+
+    enum class LinkType {
+        SELF,
+        HTML,
+        PHOTOS,
+        LIKES,
+        PORTFOLIO,
+        FOLLOWING,
+        FOLLOWERS
+    }
+}

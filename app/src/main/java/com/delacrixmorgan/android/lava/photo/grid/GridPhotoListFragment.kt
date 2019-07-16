@@ -176,7 +176,8 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
                 viewModel.collage.addAll(list)
                 adapter.updateDataSet(viewModel.collage)
-                recyclerView.smoothScrollToPosition(previousPosition)
+
+                if (isVisible) recyclerView.smoothScrollToPosition(previousPosition)
             }
         })
     }
@@ -205,7 +206,8 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
                 viewModel.collage.addAll(list)
                 adapter.updateDataSet(viewModel.collage)
-                recyclerView.smoothScrollToPosition(previousPosition)
+
+                if (isVisible) recyclerView.smoothScrollToPosition(previousPosition)
             }
         })
     }
@@ -213,6 +215,8 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     //region GridPhotoListListener
     override fun onPhotoSelected(viewHolder: View, photo: Photo, position: Int) {
         this.viewModel.currentPosition = position
+        this.viewModel.isDetailShowing = false
+
         (this.exitTransition as TransitionSet).excludeTarget(viewHolder, true)
 
         val imageListFragment = PhotoListFragment()

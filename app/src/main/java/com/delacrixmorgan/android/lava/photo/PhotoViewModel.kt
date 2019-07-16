@@ -15,6 +15,7 @@ import com.delacrixmorgan.android.data.model.Photo
 class PhotoViewModel : ViewModel() {
     var currentPosition = 0
     var collage = arrayListOf<Photo>()
+    var isDetailShowing = false
 
     var queryText: String? = null
     var displayMetrics: DisplayMetrics? = null

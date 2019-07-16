@@ -1,6 +1,8 @@
 package com.delacrixmorgan.android.lava
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.View
@@ -28,6 +30,12 @@ fun Fragment.hideSoftInputKeyboard() {
     this.view?.hideSoftInputKeyboard()
 }
 
+fun Fragment.launchWebsite(url: String) {
+    val intent = Intent(Intent.ACTION_VIEW)
+
+    intent.data = Uri.parse(url)
+    startActivity(intent)
+}
 
 //region View
 fun View.hideSoftInputKeyboard() {

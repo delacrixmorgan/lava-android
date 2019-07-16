@@ -10,6 +10,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -20,7 +21,10 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.delacrixmorgan.android.data.controller.PhotoDataController
 import com.delacrixmorgan.android.data.model.Photo
+import com.delacrixmorgan.android.data.model.User
 import com.delacrixmorgan.android.lava.R
+import com.delacrixmorgan.android.lava.launchWebsite
+import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import kotlinx.android.synthetic.main.fragment_photo_detail.*
 
 /**
@@ -44,9 +48,13 @@ class PhotoDetailFragment : Fragment() {
     }
 
     private var photo: Photo? = null
+    private val viewModel: PhotoViewModel by lazy {
+        ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        this.userVisibleHint = false
         postponeEnterTransition()
 
         if (this.sharedElementEnterTransition == null) {
@@ -64,8 +72,29 @@ class PhotoDetailFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_photo_detail, container, false)
     }
 
+    override fun setMenuVisibility(menuVisible: Boolean) {
+        super.setMenuVisibility(menuVisible)
+        if (menuVisible && isVisible) {
+            this.bottomViewGroup.isVisible = this.viewModel.isDetailShowing
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        this.bigImageView.setOnClickListener {
+            this.viewModel.isDetailShowing = !this.viewModel.isDetailShowing
+            this.bottomViewGroup.isVisible = this.viewModel.isDetailShowing
+        }
+
+        val authorName = this.photo?.user?.name
+        this.authorTextView.text = "Photo by $authorName on Unsplash"
+        this.authorTextView.setOnClickListener {
+            this.photo?.user?.getLink(User.LinkType.HTML)?.let { url ->
+                launchWebsite(url)
+            }
+        }
+
         val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL).dontTransform()
 
         ViewCompat.setTransitionName(this.gridImageView, this.photo?.getUrl(Photo.UrlType.THUMB))
