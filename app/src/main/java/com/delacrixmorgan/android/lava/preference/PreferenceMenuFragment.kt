@@ -26,7 +26,6 @@ class PreferenceMenuFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         this.buildNumberTextView.text = getString(R.string.message_build_version_name, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
-        this.backgroundImageView.setSaturation(0.2F)
 
         this.backButton.setOnClickListener {
             this.activity?.supportFragmentManager?.popBackStack()

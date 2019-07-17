@@ -45,8 +45,6 @@ class SearchMenuFragment : Fragment() {
         setupSearchView()
         updateActionButtonIcon()
 
-        this.backgroundImageView.setSaturation(0.2F)
-
         this.authorTextView.setOnClickListener {
             launchWebsite(BACKGROUND_URL)
         }
