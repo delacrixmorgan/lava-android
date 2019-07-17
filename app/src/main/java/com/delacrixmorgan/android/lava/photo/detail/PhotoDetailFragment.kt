@@ -75,7 +75,7 @@ class PhotoDetailFragment : Fragment() {
     override fun setMenuVisibility(menuVisible: Boolean) {
         super.setMenuVisibility(menuVisible)
         if (menuVisible && isVisible) {
-            this.bottomViewGroup.isVisible = this.viewModel.isDetailShowing
+            toggleViewGroupVisibility()
         }
     }
 
@@ -84,7 +84,11 @@ class PhotoDetailFragment : Fragment() {
 
         this.bigImageView.setOnClickListener {
             this.viewModel.isDetailShowing = !this.viewModel.isDetailShowing
-            this.bottomViewGroup.isVisible = this.viewModel.isDetailShowing
+            toggleViewGroupVisibility()
+        }
+
+        this.backButton.setOnClickListener {
+            this.activity?.onBackPressed()
         }
 
         val authorName = this.photo?.user?.name
@@ -94,8 +98,6 @@ class PhotoDetailFragment : Fragment() {
                 launchWebsite(url)
             }
         }
-
-        val requestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL).dontTransform()
 
         ViewCompat.setTransitionName(this.gridImageView, this.photo?.getUrl(Photo.UrlType.THUMB))
         Glide.with(view.context)
@@ -117,7 +119,12 @@ class PhotoDetailFragment : Fragment() {
                     }
 
                 })
-                .apply(requestOptions)
+                .apply(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL).dontTransform())
                 .into(this.gridImageView)
+    }
+
+    private fun toggleViewGroupVisibility() {
+        this.topViewGroup.isVisible = this.viewModel.isDetailShowing
+        this.bottomViewGroup.isVisible = this.viewModel.isDetailShowing
     }
 }
