@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.SharedElementCallback
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
 import androidx.lifecycle.ViewModelProviders
@@ -74,17 +75,20 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         val maxHeight = this.viewModel.heightPixels / SPAN_COUNT
 
         this.layoutManager = AspectRatioGridLayoutManager(
-                context = view.context,
-                spanCount = SPAN_COUNT,
-                aspectRatio = GRID_LAYOUT_ASPECT_RATIO,
-                fittingSize = this.viewModel.widthPixels
+            context = view.context,
+            spanCount = SPAN_COUNT,
+            aspectRatio = GRID_LAYOUT_ASPECT_RATIO,
+            fittingSize = this.viewModel.widthPixels
         )
         this.adapter = GridPhotoRecyclerViewAdapter(maxHeight, this)
         this.adapter.updateDataSet(this.viewModel.collage)
 
+
         this.recyclerView.addOnLayoutChangeListener(this)
         this.recyclerView.adapter = this.adapter
         this.recyclerView.layoutManager = this.layoutManager
+
+        this.loadingAnimationView.isVisible = this.viewModel.collage.isEmpty()
 
         this.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -104,10 +108,10 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         })
 
         this.swipeRefreshLayout.setColorSchemeColors(
-                R.color.colorPrimary.compatColor(this.context),
-                R.color.colorPrimaryDark.compatColor(this.context),
-                R.color.colorAccent.compatColor(this.context),
-                R.color.colorPrimaryLight.compatColor(this.context)
+            R.color.colorPrimary.compatColor(this.context),
+            R.color.colorPrimaryDark.compatColor(this.context),
+            R.color.colorAccent.compatColor(this.context),
+            R.color.colorPrimaryLight.compatColor(this.context)
         )
 
         this.swipeRefreshLayout.setOnRefreshListener {
@@ -139,10 +143,11 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     }
 
     private fun prepareTransitions() {
-        this.exitTransition = TransitionInflater.from(this.context).inflateTransition(R.transition.grid_exit_transition).apply {
-            duration = 375
-            startDelay = 25
-        }
+        this.exitTransition =
+            TransitionInflater.from(this.context).inflateTransition(R.transition.grid_exit_transition).apply {
+                duration = 375
+                startDelay = 25
+            }
 
         postponeEnterTransition()
         setExitSharedElementCallback(object : SharedElementCallback() {
@@ -164,22 +169,26 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         }
 
         val page = (this.adapter.itemCount / 30) + 1
-        PhotoDataController.searchPhotos(requireContext(), query = query, page = page, listener = object : LavaRestClient.LoadListListener<Photo> {
-            override fun onComplete(list: List<Photo>, error: Exception?) {
-                error?.let {
-                    Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
-                    return
+        PhotoDataController.searchPhotos(
+            requireContext(),
+            query = query,
+            page = page,
+            listener = object : LavaRestClient.LoadListListener<Photo> {
+                override fun onComplete(list: List<Photo>, error: Exception?) {
+                    error?.let {
+                        Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
+                        return
+                    }
+
+                    BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
+                    val previousPosition = viewModel.collage.size
+
+                    viewModel.collage.addAll(list)
+                    adapter.updateDataSet(viewModel.collage)
+
+                    if (isVisible) recyclerView.smoothScrollToPosition(previousPosition)
                 }
-
-                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
-                val previousPosition = viewModel.collage.size
-
-                viewModel.collage.addAll(list)
-                adapter.updateDataSet(viewModel.collage)
-
-                if (isVisible) recyclerView.smoothScrollToPosition(previousPosition)
-            }
-        })
+            })
     }
 
     private fun refreshFromServer() {
@@ -189,27 +198,33 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         }
 
         val page = (this.adapter.itemCount / 30) + 1
-        PhotoDataController.loadCuratedPhotos(requireContext(), page = page, curatedType = CuratedType.LATEST, listener = object : LavaRestClient.LoadListListener<Photo> {
-            override fun onComplete(list: List<Photo>, error: Exception?) {
-                if (swipeRefreshLayout != null) {
-                    swipeRefreshLayout.isRefreshing = false
+        PhotoDataController.loadCuratedPhotos(
+            requireContext(),
+            page = page,
+            curatedType = CuratedType.LATEST,
+            listener = object : LavaRestClient.LoadListListener<Photo> {
+                override fun onComplete(list: List<Photo>, error: Exception?) {
+                    loadingAnimationView.isVisible = false
+
+                    if (swipeRefreshLayout != null) {
+                        swipeRefreshLayout.isRefreshing = false
+                    }
+
+                    error?.let {
+                        Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
+                        return
+                    }
+
+                    BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
+
+                    val previousPosition = viewModel.collage.size
+
+                    viewModel.collage.addAll(list)
+                    adapter.updateDataSet(viewModel.collage)
+
+                    if (isVisible) recyclerView.smoothScrollToPosition(previousPosition)
                 }
-
-                error?.let {
-                    Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
-                    return
-                }
-
-                BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
-
-                val previousPosition = viewModel.collage.size
-
-                viewModel.collage.addAll(list)
-                adapter.updateDataSet(viewModel.collage)
-
-                if (isVisible) recyclerView.smoothScrollToPosition(previousPosition)
-            }
-        })
+            })
     }
 
     //region GridPhotoListListener
@@ -221,7 +236,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
 
         val imageListFragment = PhotoListFragment()
         val transitionName = ViewCompat.getTransitionName(viewHolder.gridImageView)
-                ?: "gridImageView"
+            ?: "gridImageView"
 
         this.activity?.supportFragmentManager?.transaction {
             addSharedElement(viewHolder.gridImageView, transitionName)
@@ -237,7 +252,17 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
     //endregion
 
     //region View.OnLayoutChangeListener
-    override fun onLayoutChange(view: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
+    override fun onLayoutChange(
+        view: View?,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+        oldLeft: Int,
+        oldTop: Int,
+        oldRight: Int,
+        oldBottom: Int
+    ) {
         this.recyclerView.removeOnLayoutChangeListener(this)
         val layoutManager = this.recyclerView.layoutManager ?: return
         val currentPosition = this.viewModel.currentPosition
