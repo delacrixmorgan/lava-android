@@ -25,6 +25,11 @@ class PreferenceCreditsListFragment : Fragment() {
             val url = "https://unsplash.com"
             launchWebsite(url)
         }
+        
+        this.lottieTextView.setOnClickListener {
+            val url = "https://lottiefiles.com/lottiefiles"
+            launchWebsite(url)
+        }
 
         this.doneButton.setOnClickListener {
             this.activity?.supportFragmentManager?.popBackStack()
