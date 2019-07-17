@@ -1,5 +1,7 @@
 package com.delacrixmorgan.android.lava
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -67,7 +69,7 @@ class SearchMenuFragment : Fragment() {
         }
 
         this.shareButton.setOnClickListener {
-
+            launchPlayStore(BuildConfig.APPLICATION_ID)
         }
     }
 
@@ -117,5 +119,13 @@ class SearchMenuFragment : Fragment() {
             replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
             addToBackStack(fragment::class.java.simpleName)
         }
+    }
+
+    private fun launchPlayStore(packageName: String) {
+        val url = "https://play.google.com/store/apps/details?id=$packageName"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
     }
 }
