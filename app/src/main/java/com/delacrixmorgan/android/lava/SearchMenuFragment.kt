@@ -40,6 +40,8 @@ class SearchMenuFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupSearchView()
         updateActionButtonIcon()
 
         Glide.with(view.context)
@@ -51,11 +53,26 @@ class SearchMenuFragment : Fragment() {
 
         this.backgroundImageView.setSaturation(0.2F)
 
-        this.searchView.setQuery(this.viewModel.queryText, true)
-
         this.authorTextView.setOnClickListener {
             launchWebsite(BACKGROUND_URL)
         }
+
+        this.menuButton.setOnClickListener {
+
+        }
+
+        this.actionButton.setOnClickListener {
+            hideSoftInputKeyboard()
+            launchGridPhotoListFragment()
+        }
+
+        this.shareButton.setOnClickListener {
+
+        }
+    }
+
+    private fun setupSearchView() {
+        this.searchView.setQuery(this.viewModel.queryText, true)
 
         this.searchViewCardView.setOnClickListener {
             this.searchView.isFocusable = true
@@ -83,11 +100,6 @@ class SearchMenuFragment : Fragment() {
                 return true
             }
         })
-
-        this.actionButton.setOnClickListener {
-            hideSoftInputKeyboard()
-            launchGridPhotoListFragment()
-        }
     }
 
     private fun updateActionButtonIcon() {
