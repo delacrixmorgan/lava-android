@@ -6,11 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
-import com.delacrixmorgan.android.lava.BuildConfig
-import com.delacrixmorgan.android.lava.R
+import com.delacrixmorgan.android.lava.*
 import com.delacrixmorgan.android.lava.databinding.FragmentPreferenceMenuBinding
-import com.delacrixmorgan.android.lava.launchWebsite
-import com.delacrixmorgan.android.lava.shareAppIntent
 import kotlinx.android.synthetic.main.fragment_preference_menu.*
 
 class PreferenceMenuFragment : Fragment() {
@@ -29,6 +26,7 @@ class PreferenceMenuFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         this.buildNumberTextView.text = getString(R.string.message_build_version_name, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+        this.backgroundImageView.setSaturation(0.2F)
 
         this.backButton.setOnClickListener {
             this.activity?.supportFragmentManager?.popBackStack()

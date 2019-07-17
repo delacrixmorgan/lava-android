@@ -29,7 +29,6 @@ import kotlinx.android.synthetic.main.fragment_search_menu.*
 class SearchMenuFragment : Fragment() {
 
     companion object {
-        private const val BACKGROUND_SRC = "https://images.unsplash.com/photo-1548588627-f978862b85e1?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1351&q=80"
         private const val BACKGROUND_URL = "https://unsplash.com/@tobsef"
     }
 
@@ -46,13 +45,6 @@ class SearchMenuFragment : Fragment() {
 
         setupSearchView()
         updateActionButtonIcon()
-
-        Glide.with(view.context)
-                .load(BACKGROUND_SRC)
-                .apply(RequestOptions()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .dontTransform())
-                .into(this.backgroundImageView)
 
         this.backgroundImageView.setSaturation(0.2F)
 

@@ -22,8 +22,14 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:background="@color/colorPrimary">
+                android:layout_height="180dp">
+
+                <ImageView
+                    android:id="@+id/backgroundImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/bg_general"
+                    android:scaleType="centerCrop" />
 
                 <ImageButton
                     android:id="@+id/backButton"
