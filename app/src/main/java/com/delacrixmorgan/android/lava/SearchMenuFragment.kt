@@ -1,7 +1,5 @@
 package com.delacrixmorgan.android.lava
 
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +25,11 @@ import kotlinx.android.synthetic.main.fragment_search_menu.*
 
 class SearchMenuFragment : Fragment() {
 
+    companion object {
+        private const val BACKGROUND_SRC = "https://images.unsplash.com/photo-1548588627-f978862b85e1?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1351&q=80"
+        private const val BACKGROUND_URL = "https://unsplash.com/@tobsef"
+    }
+
     private val viewModel: PhotoViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
     }
@@ -39,21 +42,20 @@ class SearchMenuFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         updateActionButtonIcon()
 
-        val backgroundSrc = "https://images.unsplash.com/photo-1548588627-f978862b85e1?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1351&q=80"
-
         Glide.with(view.context)
-                .load(backgroundSrc)
+                .load(BACKGROUND_SRC)
                 .apply(RequestOptions()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .dontTransform())
                 .into(this.backgroundImageView)
 
-        val colorMatrix = ColorMatrix()
-        colorMatrix.setSaturation(0.2F)
-
-        this.backgroundImageView.colorFilter = ColorMatrixColorFilter(colorMatrix)
+        this.backgroundImageView.setSaturation(0.2F)
 
         this.searchView.setQuery(this.viewModel.queryText, true)
+
+        this.authorTextView.setOnClickListener {
+            launchWebsite(BACKGROUND_URL)
+        }
 
         this.searchViewCardView.setOnClickListener {
             this.searchView.isFocusable = true

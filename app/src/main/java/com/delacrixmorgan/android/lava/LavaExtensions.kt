@@ -2,11 +2,14 @@ package com.delacrixmorgan.android.lava
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.net.Uri
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
@@ -24,6 +27,13 @@ fun Int.compatColor(context: Context?): Int {
     } else {
         ContextCompat.getColor(context, this)
     }
+}
+
+fun ImageView.setSaturation(level: Float) {
+    val colorMatrix = ColorMatrix()
+    colorMatrix.setSaturation(level)
+
+    this.colorFilter = ColorMatrixColorFilter(colorMatrix)
 }
 
 fun Fragment.hideSoftInputKeyboard() {
