@@ -204,9 +204,8 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
             curatedType = CuratedType.LATEST,
             listener = object : LavaRestClient.LoadListListener<Photo> {
                 override fun onComplete(list: List<Photo>, error: Exception?) {
-                    loadingAnimationView.isVisible = false
-
-                    if (swipeRefreshLayout != null) {
+                    if (isVisible){
+                        loadingAnimationView.isVisible = false
                         swipeRefreshLayout.isRefreshing = false
                     }
 
