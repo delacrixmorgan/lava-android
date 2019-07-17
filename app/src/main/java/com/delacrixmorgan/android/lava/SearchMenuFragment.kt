@@ -15,6 +15,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.delacrixmorgan.android.lava.photo.grid.GridPhotoListFragment
+import com.delacrixmorgan.android.lava.preference.PreferenceMenuFragment
 import kotlinx.android.synthetic.main.fragment_search_menu.*
 
 /**
@@ -60,7 +61,7 @@ class SearchMenuFragment : Fragment() {
         }
 
         this.menuButton.setOnClickListener {
-
+            launchPreferenceMenuFragment()
         }
 
         this.actionButton.setOnClickListener {
@@ -115,6 +116,14 @@ class SearchMenuFragment : Fragment() {
     private fun launchGridPhotoListFragment() {
         val fragment = GridPhotoListFragment.newInstance()
         this.viewModel.collage.clear()
+        this.activity?.supportFragmentManager?.transaction {
+            replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
+            addToBackStack(fragment::class.java.simpleName)
+        }
+    }
+
+    private fun launchPreferenceMenuFragment() {
+        val fragment = PreferenceMenuFragment.newInstance()
         this.activity?.supportFragmentManager?.transaction {
             replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
             addToBackStack(fragment::class.java.simpleName)

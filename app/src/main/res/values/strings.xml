@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Lava</string>
+    <string name="message_build_version_name">v%s #%d</string>
+    <string name="fragment_preference_menu_body_share_message">Psst don\'t tell anyone 🤫 I\'m using Lava and it\'s awesome 🔥!\n\nhttps://play.google.com/store/apps/details?id=com.delacrixmorgan.android.lava</string>
+
+    <string name="fragment_preference_menu_title_credits">Hearts and Kisses</string>
+    <string name="fragment_preference_menu_title_source_code">Source Code</string>
+    <string name="fragment_preference_menu_title_share">Spread the Word</string>
 </resources>

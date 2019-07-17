@@ -36,6 +36,15 @@ fun ImageView.setSaturation(level: Float) {
     this.colorFilter = ColorMatrixColorFilter(colorMatrix)
 }
 
+fun Context.shareAppIntent(message: String) {
+    val intent = Intent(Intent.ACTION_SEND)
+
+    intent.type = "text/plain"
+    intent.putExtra(Intent.EXTRA_TEXT, message)
+
+    startActivity(Intent.createChooser(intent, getString(R.string.fragment_preference_menu_title_share)))
+}
+
 fun Fragment.hideSoftInputKeyboard() {
     this.view?.hideSoftInputKeyboard()
 }

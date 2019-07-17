@@ -189,7 +189,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         }
 
         val page = (this.adapter.itemCount / 30) + 1
-        PhotoDataController.loadCuratedPhotos(requireContext(), page = page, curatedType = CuratedType.POPULAR, listener = object : LavaRestClient.LoadListListener<Photo> {
+        PhotoDataController.loadCuratedPhotos(requireContext(), page = page, curatedType = CuratedType.LATEST, listener = object : LavaRestClient.LoadListListener<Photo> {
             override fun onComplete(list: List<Photo>, error: Exception?) {
                 if (swipeRefreshLayout != null) {
                     swipeRefreshLayout.isRefreshing = false
