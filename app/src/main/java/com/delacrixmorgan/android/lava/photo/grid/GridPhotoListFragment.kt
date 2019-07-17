@@ -118,6 +118,8 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
             this.viewModel.collage.clear()
             this.adapter.removeDataSet()
 
+            this.loadingAnimationView.isVisible = true
+            this.swipeRefreshLayout.isRefreshing = false
             this.swipeRefreshLayout.performHapticContextClick()
             refreshFromServer()
         }
@@ -175,18 +177,7 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
             page = page,
             listener = object : LavaRestClient.LoadListListener<Photo> {
                 override fun onComplete(list: List<Photo>, error: Exception?) {
-                    error?.let {
-                        Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
-                        return
-                    }
-
-                    BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
-                    val previousPosition = viewModel.collage.size
-
-                    viewModel.collage.addAll(list)
-                    adapter.updateDataSet(viewModel.collage)
-
-                    if (isVisible) recyclerView.smoothScrollToPosition(previousPosition)
+                    updateDataSet(list, error)
                 }
             })
     }
@@ -204,24 +195,27 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
             curatedType = CuratedType.LATEST,
             listener = object : LavaRestClient.LoadListListener<Photo> {
                 override fun onComplete(list: List<Photo>, error: Exception?) {
-                    if (isVisible){
-                        loadingAnimationView.isVisible = false
-                        swipeRefreshLayout.isRefreshing = false
-
-                        error?.let {
-                            Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
-                            return
-                        }
-                    }
-                    BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
-                    val previousPosition = viewModel.collage.size
-
-                    viewModel.collage.addAll(list)
-                    adapter.updateDataSet(viewModel.collage)
-
-                    if (isVisible) recyclerView.smoothScrollToPosition(previousPosition)
+                    updateDataSet(list, error)
                 }
             })
+    }
+
+    private fun updateDataSet(list: List<Photo>, error: Exception?){
+        if (isVisible){
+            loadingAnimationView.isVisible = false
+
+            error?.let {
+                Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
+                return
+            }
+        }
+        BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
+        val previousPosition = viewModel.collage.size
+
+        viewModel.collage.addAll(list)
+        adapter.updateDataSet(viewModel.collage)
+
+        if (isVisible) recyclerView.smoothScrollToPosition(previousPosition)
     }
 
     //region GridPhotoListListener
