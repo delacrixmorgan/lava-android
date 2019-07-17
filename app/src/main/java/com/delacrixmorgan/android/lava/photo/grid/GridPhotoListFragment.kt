@@ -207,15 +207,13 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
                     if (isVisible){
                         loadingAnimationView.isVisible = false
                         swipeRefreshLayout.isRefreshing = false
-                    }
 
-                    error?.let {
-                        Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
-                        return
+                        error?.let {
+                            Snackbar.make(rootView, "${it.message}", Snackbar.LENGTH_SHORT).show()
+                            return
+                        }
                     }
-
                     BigImageViewer.prefetch(*list.mapNotNull { Uri.parse(it.getUrl(Photo.UrlType.REGULAR)) }.toTypedArray())
-
                     val previousPosition = viewModel.collage.size
 
                     viewModel.collage.addAll(list)

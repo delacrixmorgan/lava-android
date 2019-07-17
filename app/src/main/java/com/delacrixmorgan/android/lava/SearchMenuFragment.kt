@@ -3,6 +3,7 @@ package com.delacrixmorgan.android.lava
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +11,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
 import androidx.lifecycle.ViewModelProviders
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
+import androidx.transition.Slide
 import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.delacrixmorgan.android.lava.photo.grid.GridPhotoListFragment
 import com.delacrixmorgan.android.lava.preference.PreferenceMenuFragment
@@ -107,6 +106,8 @@ class SearchMenuFragment : Fragment() {
 
     private fun launchGridPhotoListFragment() {
         val fragment = GridPhotoListFragment.newInstance()
+        fragment.enterTransition = Slide(Gravity.BOTTOM).setDuration(200)
+
         this.viewModel.collage.clear()
         this.activity?.supportFragmentManager?.transaction {
             replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
@@ -116,6 +117,8 @@ class SearchMenuFragment : Fragment() {
 
     private fun launchPreferenceMenuFragment() {
         val fragment = PreferenceMenuFragment.newInstance()
+        fragment.enterTransition = Slide(Gravity.START).setDuration(200)
+
         this.activity?.supportFragmentManager?.transaction {
             replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
             addToBackStack(fragment::class.java.simpleName)
