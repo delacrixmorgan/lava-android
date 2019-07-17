@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.transaction
 import com.delacrixmorgan.android.lava.BuildConfig
 import com.delacrixmorgan.android.lava.R
 import com.delacrixmorgan.android.lava.databinding.FragmentPreferenceMenuBinding
@@ -29,8 +30,12 @@ class PreferenceMenuFragment : Fragment() {
 
         this.buildNumberTextView.text = getString(R.string.message_build_version_name, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
 
-        this.creditsViewGroup.setOnClickListener {
+        this.backButton.setOnClickListener {
+            this.activity?.supportFragmentManager?.popBackStack()
+        }
 
+        this.creditsViewGroup.setOnClickListener {
+            launchPreferenceCreditsListFragment()
         }
 
         this.sourceCodeViewGroup.setOnClickListener {
@@ -39,6 +44,14 @@ class PreferenceMenuFragment : Fragment() {
 
         this.shareViewGroup.setOnClickListener {
             view.context.shareAppIntent(getString(R.string.fragment_preference_menu_body_share_message))
+        }
+    }
+
+    private fun launchPreferenceCreditsListFragment() {
+        val fragment = PreferenceCreditsListFragment.newInstance()
+        this.activity?.supportFragmentManager?.transaction {
+            replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
+            addToBackStack(fragment::class.java.simpleName)
         }
     }
 }
