@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.delacrixmorgan.android.lava.R
 import com.delacrixmorgan.android.lava.launchWebsite
 import kotlinx.android.synthetic.main.fragment_preference_credits_list.*
 
-class PreferenceCreditsListFragment : Fragment() {
+class PreferenceCreditsListFragment : DialogFragment() {
     companion object {
         fun newInstance() = PreferenceCreditsListFragment()
     }
@@ -32,7 +33,7 @@ class PreferenceCreditsListFragment : Fragment() {
         }
 
         this.doneButton.setOnClickListener {
-            this.activity?.supportFragmentManager?.popBackStack()
+            dismiss()
         }
     }
 }

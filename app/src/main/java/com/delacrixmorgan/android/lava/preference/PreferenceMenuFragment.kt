@@ -45,10 +45,13 @@ class PreferenceMenuFragment : Fragment() {
     }
 
     private fun launchPreferenceCreditsListFragment() {
+        val fragmentManager =  this.activity?.supportFragmentManager ?: return
         val fragment = PreferenceCreditsListFragment.newInstance()
-        this.activity?.supportFragmentManager?.transaction {
-            replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
-            addToBackStack(fragment::class.java.simpleName)
-        }
+        fragment.show(fragmentManager, fragment::class.java.simpleName)
+
+//        this.activity?.supportFragmentManager?.transaction {
+//            replace(R.id.mainContainer, fragment, fragment::class.java.simpleName)
+//            addToBackStack(fragment::class.java.simpleName)
+//        }
     }
 }
