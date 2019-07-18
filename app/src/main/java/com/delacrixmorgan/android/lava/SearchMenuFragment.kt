@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
 import androidx.lifecycle.ViewModelProviders
 import androidx.transition.Slide
+import com.delacrixmorgan.android.data.controller.SuggestionDataController
 import com.delacrixmorgan.android.lava.photo.PhotoViewModel
 import com.delacrixmorgan.android.lava.photo.grid.GridPhotoListFragment
 import com.delacrixmorgan.android.lava.preference.PreferenceMenuFragment
@@ -31,6 +32,7 @@ class SearchMenuFragment : Fragment() {
         private const val BACKGROUND_URL = "https://unsplash.com/@tobsef"
     }
 
+    private val suggestedWord = SuggestionDataController.randomSuggestion()
     private val viewModel: PhotoViewModel by lazy {
         ViewModelProviders.of(requireActivity()).get(PhotoViewModel::class.java)
     }
@@ -53,6 +55,12 @@ class SearchMenuFragment : Fragment() {
             launchPreferenceMenuFragment()
         }
 
+        this.suggestionViewGroup.setOnClickListener {
+            hideSoftInputKeyboard()
+            this.viewModel.queryText = this.suggestedWord
+            launchGridPhotoListFragment()
+        }
+
         this.actionButton.setOnClickListener {
             hideSoftInputKeyboard()
             launchGridPhotoListFragment()
@@ -64,7 +72,10 @@ class SearchMenuFragment : Fragment() {
     }
 
     private fun setupSearchView() {
+        this.searchView.queryHint = "Try \"$suggestedWord\""
+
         this.searchView.setQuery(this.viewModel.queryText, true)
+        this.searchView.clearFocus()
 
         this.searchViewCardView.setOnClickListener {
             this.searchView.isFocusable = true
@@ -96,7 +107,7 @@ class SearchMenuFragment : Fragment() {
 
     private fun updateActionButtonIcon() {
         if (this.viewModel.queryText.isNullOrBlank()) {
-            this.actionButton.setImageResource(R.drawable.ic_arrow_down)
+            this.actionButton.setImageResource(R.drawable.ic_shuffle)
         } else {
             this.actionButton.setImageResource(R.drawable.ic_search)
         }

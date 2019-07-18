@@ -55,9 +55,31 @@
                 android:id="@+id/searchView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:iconifiedByDefault="false"
-                android:inputType="textCapWords" />
+                android:inputType="textCapWords"
+                app:iconifiedByDefault="false" />
         </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:id="@+id/suggestionViewGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Magical Button"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/white" />
+        </LinearLayout>
     </LinearLayout>
 
     <ImageButton
@@ -78,7 +100,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_white_ring"
         android:padding="8dp"
-        android:src="@drawable/ic_arrow_down"
+        android:src="@drawable/ic_shuffle"
         app:layout_constraintBottom_toTopOf="@id/authorTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
