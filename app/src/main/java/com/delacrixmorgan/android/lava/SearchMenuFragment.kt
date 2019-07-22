@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.fragment_search_menu.*
 class SearchMenuFragment : Fragment() {
 
     companion object {
-        private const val BACKGROUND_URL = "https://unsplash.com/@tobsef"
+        private const val BACKGROUND_URL = "https://unsplash.com/photos/BLTcKiKXbzU"
     }
 
     private val suggestedWord = SuggestionDataController.randomSuggestion()
