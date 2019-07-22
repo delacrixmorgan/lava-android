@@ -13,5 +13,6 @@ import com.delacrixmorgan.android.data.model.User
 data class PhotoWrapper(
     val id: String,
     val urls: Map<String, String>,
+    val links: Map<String, String>,
     val user: User
 )

@@ -13,6 +13,7 @@ import com.delacrixmorgan.android.data.controller.UserDataController
 data class Photo(
     val id: String,
     val urls: Map<String, String>,
+    val links: Map<String, String>,
     val userId: String
 ) {
     val user: User?
@@ -24,11 +25,22 @@ data class Photo(
         return urls[urlType.name.toLowerCase()].toString()
     }
 
+    fun getLink(linkType: LinkType): String {
+        return links[linkType.name.toLowerCase()].toString()
+    }
+
     enum class UrlType {
         RAW,
         FULL,
         REGULAR,
         SMALL,
         THUMB
+    }
+
+    enum class LinkType {
+        SELF,
+        HTML,
+        DOWNLOAD,
+        DOWNLOAD_LOCATION
     }
 }

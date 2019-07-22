@@ -92,9 +92,10 @@ class PhotoDetailFragment : Fragment() {
         }
 
         val authorName = this.photo?.user?.name
+
         this.authorTextView.text = "Photo by $authorName on Unsplash"
         this.authorTextView.setOnClickListener {
-            this.photo?.user?.getLink(User.LinkType.HTML)?.let { url ->
+            this.photo?.getLink(Photo.LinkType.HTML)?.let {url ->
                 launchWebsite(url)
             }
         }

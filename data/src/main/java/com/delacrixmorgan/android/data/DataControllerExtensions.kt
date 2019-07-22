@@ -25,7 +25,7 @@ fun List<PhotoWrapper>.processPhotos(): List<Photo> {
 }
 
 fun PhotoWrapper.extractPhoto(): Photo {
-    return Photo(id = this.id, urls = this.urls, userId = this.user.id)
+    return Photo(id = this.id, urls = this.urls, links = this.links, userId = this.user.id)
 }
 
 fun PhotoWrapper.extractUser(): User {
