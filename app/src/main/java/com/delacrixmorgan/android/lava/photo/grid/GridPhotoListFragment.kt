@@ -83,7 +83,6 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         this.adapter = GridPhotoRecyclerViewAdapter(maxHeight, this)
         this.adapter.updateDataSet(this.viewModel.collage)
 
-
         this.recyclerView.addOnLayoutChangeListener(this)
         this.recyclerView.adapter = this.adapter
         this.recyclerView.layoutManager = this.layoutManager
@@ -164,44 +163,35 @@ class GridPhotoListFragment : Fragment(), GridPhotoListListener, View.OnLayoutCh
         })
     }
 
-    private fun searchFromServer(query: String?) {
-        if (query == null) {
-            refreshFromServer()
-            return
-        }
-
-        val page = (this.adapter.itemCount / 30) + 1
-        PhotoDataController.searchPhotos(
-            requireContext(),
-            query = query,
-            page = page,
-            listener = object : LavaRestClient.LoadListListener<Photo> {
-                override fun onComplete(list: List<Photo>, error: Exception?) {
-                    updateDataSet(list, error)
-                }
-            })
-    }
-
     private fun refreshFromServer() {
-        if (this.viewModel.queryText?.isNotBlank() == true) {
-            searchFromServer(this.viewModel.queryText)
-            return
-        }
-
+        val context = requireContext()
         val page = (this.adapter.itemCount / 30) + 1
-        PhotoDataController.loadCuratedPhotos(
-            requireContext(),
-            page = page,
-            curatedType = CuratedType.LATEST,
-            listener = object : LavaRestClient.LoadListListener<Photo> {
-                override fun onComplete(list: List<Photo>, error: Exception?) {
-                    updateDataSet(list, error)
-                }
-            })
+
+        when (this.viewModel.isSearchMode) {
+            true -> PhotoDataController.searchPhotos(
+                context,
+                query = this.viewModel.queryText.toString(),
+                page = page,
+                listener = object : LavaRestClient.LoadListListener<Photo> {
+                    override fun onComplete(list: List<Photo>, error: Exception?) {
+                        updateDataSet(list, error)
+                    }
+                })
+
+            false -> PhotoDataController.loadCuratedPhotos(
+                context,
+                page = page,
+                curatedType = CuratedType.LATEST,
+                listener = object : LavaRestClient.LoadListListener<Photo> {
+                    override fun onComplete(list: List<Photo>, error: Exception?) {
+                        updateDataSet(list, error)
+                    }
+                })
+        }
     }
 
-    private fun updateDataSet(list: List<Photo>, error: Exception?){
-        if (isVisible){
+    private fun updateDataSet(list: List<Photo>, error: Exception?) {
+        if (isVisible) {
             loadingAnimationView.isVisible = false
 
             error?.let {

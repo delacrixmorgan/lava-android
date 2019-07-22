@@ -20,6 +20,11 @@ class PhotoViewModel : ViewModel() {
     var queryText: String? = null
     var displayMetrics: DisplayMetrics? = null
 
+    val isSearchMode: Boolean
+        get() {
+            return !this.queryText.isNullOrBlank()
+        }
+
     val widthPixels: Int
         get() {
             return this.displayMetrics?.widthPixels ?: 0
